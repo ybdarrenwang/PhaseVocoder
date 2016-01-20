@@ -1,19 +1,11 @@
 #ifndef __VOCODERFUNCTIONS_H__
 #define __VOCODERFUNCTIONS_H__
 
-#include "EngineDLL.h"
-#include "WaveFrame.h"
 #include <math.h>
-#include "CPerformer.h"
-#include "MyFFT.h"
-
-#define FFT_SIZE 4096
-#define SamplingRate 22050
-#define Atten_3dB 0.707945784
+#include "global.h"
 
 class VocoderFunc{
 public:
-	double ABS2(double a,double b);
 	void pitch_contour_refine(double *pitch, int n);
 	void cal_target_contour(double **t_pitch, int *m, double **s_pitch, int *n, 
 							double **tar_pitch, int word_no);
@@ -26,8 +18,7 @@ public:
 	void PitchShifting(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph);
 	void PitchShifting_KTH(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph, double *window, double pitch);
 	void PitchShifting_KTH_HNM(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph, 
-								double *window_mag, double *window_pha, double pitch, 
-								FILE* myfile1, FILE* myfile2, int vowel_frame_index);
+								double *window_mag, double *window_pha, double pitch, int vowel_frame_index);
 	void PS_KTH_new(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph, double *window_real, double *window_imag);
 	void TimeScaleMod(double rate, int FrameNum, double ***spectrogram, int new_FrameNum, double ***new_spectrogram, bool reset_ph);
 	int PSOLA(double **frame, double *output, double *SentenceCoeff, double *windows,

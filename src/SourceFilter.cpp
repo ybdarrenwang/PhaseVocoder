@@ -1,62 +1,4 @@
-#include "stdafx.h"
 #include "SourceFilter.h"
-
-double MIN2(int a,int b)
-{
-	if (a<b)
-		return (double)a;
-	else
-		return (double)b;
-}
-
-// calculate how many fundamental frequency vowel_marks needed
-// return: the number of vowel_marks
-int LPC_CalPath(int frame_no, int frame_shift, double *Pitch)
-{
-	int frame_ptr = 0, n = 0;
-	double my_ptr = 0, T;
-
-	while(my_ptr < frame_no*frame_shift)
-	{
-		if (Pitch[frame_ptr] == 0)
-		{
-			if (frame_ptr == 0)// if the first frame has no pitch
-			{
-				while(Pitch[frame_ptr] == 0)
-					frame_ptr++;
-				while(frame_ptr > 0)
-				{
-					Pitch[frame_ptr-1] = Pitch[frame_ptr];
-					frame_ptr--;
-				}
-			}
-			else
-				Pitch[frame_ptr] = Pitch[frame_ptr-1];
-		}
-
-		T = (double)SamplingRate/Pitch[frame_ptr];
-		my_ptr += T;
-		frame_ptr = floor(my_ptr/frame_shift);
-		n++;
-	}
-	
-	return n;
-}
-
-// record the fundamental frequency vowel_marks
-void LPC_vowel_markPath(int *vowel_mark, int n, int frame_shift, double *Pitch)
-{
-	int frame_ptr = 0;
-	double my_ptr = 0, T;
-
-	for (int i=0; i<n; i++)
-	{
-		vowel_mark[i] = floor(my_ptr);
-		T = (double)SamplingRate/Pitch[frame_ptr];
-		my_ptr += T;
-		frame_ptr = floor(my_ptr/frame_shift);
-	}
-}
 
 void SourceFilter::clear_mem(int word_no)
 {
@@ -120,15 +62,15 @@ void SourceFilter::SFDecomp_sync(double *data,double *excitation, int sample_no,
 			for (k=0; k<new_frame_len; k++) // read data
 				sf_frame[k] = data[frame_shift*(WordStart[i]+j) + k]*windows[k];
 
-			error = LPC_From_Data(sf_frame, coeff[i][0][j], new_frame_len, order);
+			error = lpc.From_Data(sf_frame, coeff[i][0][j], new_frame_len, order);
 		}
 		delete [] sf_frame;
 		delete [] windows;
 
 		// Vowel part
-		vowel_mark_no = LPC_CalPath(WordEnd[i]-WordMid[i], frame_shift, Pitch[i]);
+		vowel_mark_no = lpc.CalPath(WordEnd[i]-WordMid[i], frame_shift, Pitch[i]);
 		vowel_mark[i] = new int[vowel_mark_no];
-		LPC_vowel_markPath(vowel_mark[i], vowel_mark_no, frame_shift, Pitch[i]);
+		lpc.vowel_markPath(vowel_mark[i], vowel_mark_no, frame_shift, Pitch[i]);
 
 		frame_no[i][1] = vowel_mark_no-2;
 		coeff[i][1] = new double *[frame_no[i][1]];
@@ -145,7 +87,7 @@ void SourceFilter::SFDecomp_sync(double *data,double *excitation, int sample_no,
 			for (k=0; k<new_frame_len; k++) // read data
 				sf_frame[k] = data[frame_shift*WordMid[i] + vowel_mark[i][j] + k]*windows[k];
 
-			error = LPC_From_Data(sf_frame, coeff[i][1][j], new_frame_len, order);
+			error = lpc.From_Data(sf_frame, coeff[i][1][j], new_frame_len, order);
 
 			delete [] sf_frame;
 			delete [] windows;
@@ -280,7 +222,7 @@ void SourceFilter::SFDecomp_sync(double *data,double *excitation, int sample_no,
 				}
 
 				// LPA
-				LPC_Predict(int_coeff, prime, order, sf_predict, 1);
+				lpc.Predict(int_coeff, prime, order, sf_predict, 1);
 				excitation[sample_index] = data[sample_index] - sf_predict[0];
 
 				// update prime value
@@ -338,7 +280,7 @@ void SourceFilter::SFDecomp_non_sync(double *data,double *excitation, int sample
 			for (k=0; k<new_frame_len; k++) // read data
 				sf_frame[k] = data[frame_shift*(WordStart[i]+j) + k]*windows[k];
 
-			error = LPC_From_Data(sf_frame, coeff[i][0][j], new_frame_len, order);
+			error = lpc.From_Data(sf_frame, coeff[i][0][j], new_frame_len, order);
 		}
 
 		// Vowel part
@@ -352,7 +294,7 @@ void SourceFilter::SFDecomp_non_sync(double *data,double *excitation, int sample
 			for (k=0; k<new_frame_len; k++) // read data
 				sf_frame[k] = data[frame_shift*(WordMid[i]+j) + k]*windows[k];
 
-			error = LPC_From_Data(sf_frame, coeff[i][1][j], new_frame_len, order);
+			error = lpc.From_Data(sf_frame, coeff[i][1][j], new_frame_len, order);
 		}
 		delete [] sf_frame;
 		delete [] windows;
@@ -486,7 +428,7 @@ void SourceFilter::SFDecomp_non_sync(double *data,double *excitation, int sample
 				}
 
 				// LPA
-				LPC_Predict(int_coeff, prime, order, sf_predict, 1);
+				lpc.Predict(int_coeff, prime, order, sf_predict, 1);
 				excitation[sample_index] = data[sample_index] - sf_predict[0];
 
 				// update prime value
@@ -649,7 +591,7 @@ void SourceFilter::SFRecomb_sync(short* data, double* excitation, int sample_no,
 				}
 			
 				// LPS
-				LPC_Predict(int_coeff, prime, order, sf_predict, 1);
+				lpc.Predict(int_coeff, prime, order, sf_predict, 1);
 				
 				data[sample_index] = floor(sf_predict[0]+excitation[sample_index]);
 				if (abs(data[sample_index]) >= 25000) // a-posteriori constrain of output signal
@@ -692,13 +634,13 @@ void SourceFilter::SFRecomb_FD(double** spec, int word_index, int frame_index, i
 	int i;
 
 	if (frame_index >= WordMid)
-		LPC_SpecEnv(coeff[word_index][1][frame_index-WordMid], SpecEnv_mag, SpecEnv_pha);
+		lpc.SpecEnv(coeff[word_index][1][frame_index-WordMid], SpecEnv_mag, SpecEnv_pha);
 	else
-		LPC_SpecEnv(coeff[word_index][0][frame_index], SpecEnv_mag, SpecEnv_pha);
+		lpc.SpecEnv(coeff[word_index][0][frame_index], SpecEnv_mag, SpecEnv_pha);
 
 	for (i=0; i<FFT_SIZE/2+1; i++)
 	{
-		mag = my_func.ABS2(spec[0][i], spec[1][i])*SpecEnv_mag[i];
+		mag = lpc.ABS2(spec[0][i], spec[1][i])*SpecEnv_mag[i];
 		pha = atan2(spec[1][i], spec[0][i])+SpecEnv_pha[i];
 
 		spec[0][i] = mag*cos(pha);
@@ -707,109 +649,4 @@ void SourceFilter::SFRecomb_FD(double** spec, int word_index, int frame_index, i
 
 	delete [] SpecEnv_mag;
 	delete [] SpecEnv_pha;
-}
-
-void SourceFilter::LPC_SpecEnv(double *coeff, double *SpecEnv_mag, double *SpecEnv_pha)
-{
-	double A_real, A_imag;
-	int i,j;
-
-	for (i=0; i<FFT_SIZE/2+1; i++)
-	{
-		A_real = 1;
-		A_imag = 0;
-
-		for (j=1; j<=order; j++)
-		{
-			A_real += coeff[j-1]*cos(i*j*2.0*PI/FFT_SIZE);
-			A_imag -= coeff[j-1]*sin(i*j*2.0*PI/FFT_SIZE);
-		}
-
-		SpecEnv_mag[i] = 1.0/my_func.ABS2(A_real, A_imag);
-		SpecEnv_pha[i] = -1*atan2(A_imag, A_real);
-	}
-}
-
-/* Input : n elements of time domain data
-   Output: m lpc coefficients, excitation energy */
-double SourceFilter::LPC_From_Data(double *data,double *lpc,int n,int m)
-{
-  double *aut= new double[m+1];
-  double error;
-  int i,j;
-
-  /* autocorrelation, p+1 lag coefficients */
-
-  j=m+1;
-  while(j--){
-    double d=0;
-    for(i=j;i<n;i++)d+=data[i]*data[i-j];
-    aut[j]=d;
-  }
-  
-  /* Generate lpc coefficients from autocorr values */
-
-  error=aut[0];
-  if(error==0){
-    memset(lpc,0,m*sizeof(double));
-    return 0;
-  }
-  
-  for(i=0;i<m;i++){
-    double r=-aut[i+1];
-
-    /* Sum up this iteration's reflection coefficient; note that in
-       Vorbis we don't save it.  If anyone wants to recycle this code
-       and needs reflection coefficients, save the results of 'r' from
-       each iteration. */
-
-    for(j=0;j<i;j++)r-=lpc[j]*aut[i-j];
-    r/=error; 
-
-    /* Update LPC coefficients and total error */
-    
-    lpc[i]=r;
-    for(j=0;j<i/2;j++){
-      double tmp=lpc[j];
-      lpc[j]+=r*lpc[i-1-j];
-      lpc[i-1-j]+=r*tmp;
-    }
-    if(i%2)lpc[j]+=lpc[j]*r;
-    
-    error*=1.0-r*r;
-  }
-  
-  /* we need the error value to know how big an impulse to hit the
-     filter with later */
-  delete [] aut;
-  return error;
-}
-
-void SourceFilter::LPC_Predict(double *coeff,double *prime,int m,double *data,long n)
-{
-  /* in: coeff[0...m-1] LPC coefficients 
-         prime[0...m-1] initial values (allocated size of n+m-1)
-    out: data[0...n-1] data samples */
-
-  long i,j,o,p;
-  double y;
-  double *work = new double[m+n];
-
-  if(!prime)
-    for(i=0;i<m;i++)
-      work[i]=0.;
-  else
-    for(i=0;i<m;i++)
-      work[i]=prime[i];
-
-  for(i=0;i<n;i++){
-    y=0;
-    o=i;
-    p=m;
-    for(j=0;j<m;j++)
-      y-=work[o++]*coeff[--p];
-    data[i]=work[o]=y;
-  }
-
-  delete [] work;
 }

@@ -3,8 +3,7 @@
 
 #include <math.h>
 #include "VocoderFunctions.h"
-
-#define order 16
+#include "lpc.h"
 
 class SourceFilter{
 public:
@@ -19,9 +18,6 @@ public:
 					double* WordDurMul, int* WordStart, int* WordMid, int* WordEnd, 
 					int frame_shift, int frame_len, int* syn_bias);
 	void SFRecomb_FD(double** spec, int word_index, int frame_index, int WordMid);
-	double LPC_From_Data(double *data, double *lpc, int n, int m);
-	void LPC_Predict(double *coeff, double *prime, int m, double *data, long n);
-	void LPC_SpecEnv(double *coeff, double *SpecEnv_mag, double *SpecEnv_pha);
 
 private:
 	int** vowel_mark; // vowel_mark[i][j]: the jth vowel f0 mark of ith word
@@ -29,6 +25,7 @@ private:
 	double ****coeff; // coeff[i][j][k][m]: the mth LPC coefficient of kth frame in
 					  // consonant(j=0) or vowel(j=1) of ith word
 	VocoderFunc my_func;
+    LPC lpc;
 };
 
 #endif

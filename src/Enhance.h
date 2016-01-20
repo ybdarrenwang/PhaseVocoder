@@ -1,20 +1,7 @@
-// Enhance.h: interface for the CEnhance class.
-//
-// Copyright (C) 2002-2006 L Labs Inc. All rights reserved.
-// http://www.LLabs.com
-//
-//////////////////////////////////////////////////////////////////////
-#if !defined(AFX_ENHANCE_H__6660B56A_4933_44C9_B549_A42340CD5B24__INCLUDED_)
-#define AFX_ENHANCE_H__6660B56A_4933_44C9_B549_A42340CD5B24__INCLUDED_
+#ifndef ENHANCE_H
+#define ENHANCE_H
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-
-#include "EngineCommon.h"
-#include "sfs-libic.h"
-
-class DLLEXPORT CEnhance  
+class CEnhance  
 {
 public:
 	CEnhance();
@@ -31,11 +18,11 @@ public:
 	double GetSubtractionDegree() const { return m_fSubDegree; };
 
 	double median (const double* frame, int n);
-//	void IniNoiseSpec(const short *npInSampleInputBuffer, DWORD nNumSamples);
-	int VAD(const short *npInSampleInputBuffer,DWORD nNumSamples,double fSecondPerSample,short *npSampleOutputBuffer);
+//	void IniNoiseSpec(const short *npInSampleInputBuffer, int nNumSamples);
+	int VAD(const short *npInSampleInputBuffer,int nNumSamples,double fSecondPerSample,short *npSampleOutputBuffer);
 	// Do signal enhancement, return 0 if success, < 0 if failed;
 	// fSecondsPerSample is the inverse of sampling rate
-	int DoEnhance(const short *npInSampleInputBuffer,DWORD nNumSamples,double fSecondPerSample,short *npSampleOutputBuffer,bool *mark);
+	int DoEnhance(const short *npInSampleInputBuffer,int nNumSamples,double fSecondPerSample,short *npSampleOutputBuffer,bool *mark);
 
 private:
 	int m_nDospectsub;
@@ -45,4 +32,4 @@ private:
 //	short noisemag[1024];
 };
 
-#endif // !defined(AFX_ENHANCE_H__6660B56A_4933_44C9_B549_A42340CD5B24__INCLUDED_)
+#endif

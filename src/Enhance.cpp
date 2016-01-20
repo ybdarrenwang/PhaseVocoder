@@ -1,14 +1,5 @@
-// Enhance.cpp: implementation of the CEnhance class.
-//
-// Copyright (C) 2002-2006 L Labs Inc. All rights reserved.
-// http://www.LLabs.com
-//
-//////////////////////////////////////////////////////////////////////
-
-#include "stdafx.h"
 #include <math.h>
 #include <stdlib.h>
-//#include "Volume.h"
 #include "Enhance.h"
 
 #ifdef _DEBUG
@@ -24,26 +15,13 @@ static char THIS_FILE[]=__FILE__;
 #define SPEECH 1
 #define	NONSPEECH 0
 
-/* annotation lists */
-//#define MAXLABEL	32
-//char	*label[MAXLABEL];
-//int	nlabel=0;
-//int	exclude=0;
-
 /* buffering */
 short	*buff;
-//short	*hold;
 double	*window;
-//int	buffsize;
 double	maxenergy;
 
 /* operations selected */
-//int		docompression=0;	/* compression mode */
 const double	mu=10.0;				/* mu value for compression */
-//int		dospectsub=1;		/* spectral substraction */
-//double	subdegree=100;			/* subtraction strength */
-//int 	dofixscale=0;			/* fixed scaling */					// not supported yet
-//double	fixscale=0;				/* scaling factor (dB) */		// not supported yet
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -97,7 +75,7 @@ double CEnhance::median (const double* frame, int n)
 //////////////////////////////////////////////////////////////////////
 // Voice Active Detection
 //////////////////////////////////////////////////////////////////////
-int CEnhance::VAD(const short *pInSamples,DWORD nNumSamples,double frameduration,short *pOutSamples)
+int CEnhance::VAD(const short *pInSamples,int nNumSamples,double frameduration,short *pOutSamples)
 {
 	/* Initialize */
 	int i,j,counter = 0;
@@ -231,7 +209,7 @@ int CEnhance::VAD(const short *pInSamples,DWORD nNumSamples,double frameduration
 //////////////////////////////////////////////////////////////////////
 // Spectral Subtraction
 //////////////////////////////////////////////////////////////////////
-int CEnhance::DoEnhance(const short *pInSamples,DWORD nNumSamples,double frameduration,short *pOutSamples,bool *mark)
+int CEnhance::DoEnhance(const short *pInSamples,int nNumSamples,double frameduration,short *pOutSamples,bool *mark)
 {
 	extern int	optind;		/* option index */
 	extern char	*optarg;	/* option argument */

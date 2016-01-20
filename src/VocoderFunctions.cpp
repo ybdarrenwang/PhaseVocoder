@@ -1,7 +1,6 @@
-#include "stdafx.h"
 #include "VocoderFunctions.h"
 
-double my_PI = 3.14159265359;
+double ABS2(double a,double b) {return sqrt(a*a+b*b);}
 
 int MIN(int a,int b)
 {
@@ -14,11 +13,6 @@ int MIN(int a,int b)
 double MAX(double a, double b)
 {
 	return (a>b?a:b);
-}
-
-double VocoderFunc::ABS2(double a,double b)
-{
-	return sqrt(a*a+b*b);
 }
 
 // Pitch contour tracking and smoothing; reference: ªL°û©É master thesis
@@ -187,12 +181,12 @@ void VocoderFunc::Hamming(int len, double *window)
 	if (len%2 == 1)
 	{
 		for (i=0; i<=halflen; i++)
-			window[halflen+i] = window[halflen-i] = 0.53836 - 0.46164 * cos(2*my_PI*(halflen-i)/(len-1));
+			window[halflen+i] = window[halflen-i] = 0.53836 - 0.46164 * cos(2*PI*(halflen-i)/(len-1));
 	}
 	else
 	{
 		for (i=0; i<halflen; i++)
-			window[halflen+i] = window[halflen-i-1] = 0.53836 - 0.46164 * cos(2*my_PI*(halflen-i)/len);
+			window[halflen+i] = window[halflen-i-1] = 0.53836 - 0.46164 * cos(2*PI*(halflen-i)/len);
 	}
 }
 
@@ -536,12 +530,12 @@ void VocoderFunc::PitchShifting(double **Spectrum, double PitchQuotient, int fra
 			PQResidual[i] = (double)i*PitchQuotient - floor((double)i*PitchQuotient);
 
 			// cumulate the phasors
-			phasor_pitch[i] = phasor_pitch[prev_subband_pitch[i]] + (i*(PitchQuotient-1))*(2.0*my_PI*frame_shift)/FFT_SIZE;
+			phasor_pitch[i] = phasor_pitch[prev_subband_pitch[i]] + (i*(PitchQuotient-1))*(2.0*PI*frame_shift)/FFT_SIZE;
 
-			while(phasor_pitch[i] >= my_PI)
-				phasor_pitch[i] -= 2.0 * my_PI;
-			while(phasor_pitch[i] < -1.0*my_PI)
-				phasor_pitch[i] += 2.0 * my_PI;
+			while(phasor_pitch[i] >= PI)
+				phasor_pitch[i] -= 2.0 * PI;
+			while(phasor_pitch[i] < -1.0*PI)
+				phasor_pitch[i] += 2.0 * PI;
 		}
 	}
 
@@ -551,10 +545,10 @@ void VocoderFunc::PitchShifting(double **Spectrum, double PitchQuotient, int fra
 		phasor_pitch[i] = phasor_pitch[subband_pitch[i]];
 		StudentPha[i] += phasor_pitch[i];
 
-		while(StudentPha[i] >= my_PI)
-		   StudentPha[i] -= 2.0 * my_PI;
-		while(StudentPha[i] < -1.0*my_PI)
-		   StudentPha[i] += 2.0 * my_PI;
+		while(StudentPha[i] >= PI)
+		   StudentPha[i] -= 2.0 * PI;
+		while(StudentPha[i] < -1.0*PI)
+		   StudentPha[i] += 2.0 * PI;
 
 		SpecTemp[0][i] = StudentMag[i]*cos(StudentPha[i]);
 		SpecTemp[1][i] = StudentMag[i]*sin(StudentPha[i]);
@@ -656,12 +650,12 @@ void VocoderFunc::PitchShifting_KTH(double **Spectrum, double PitchQuotient, int
 		if (mark_phasor[max_bin] == false)
 		{
 			mark_phasor[max_bin] = true;
-			phasor_pitch[max_bin] = phasor_pitch[prev_subband_pitch[max_bin]] + (i*(PitchQuotient-1))*(2.0*my_PI*frame_shift)/FFT_SIZE;
+			phasor_pitch[max_bin] = phasor_pitch[prev_subband_pitch[max_bin]] + (i*(PitchQuotient-1))*(2.0*PI*frame_shift)/FFT_SIZE;
 
-			while(phasor_pitch[max_bin] >= my_PI)
-				phasor_pitch[max_bin] -= 2.0 * my_PI;
-			while(phasor_pitch[max_bin] < -1.0*my_PI)
-				phasor_pitch[max_bin] += 2.0 * my_PI;
+			while(phasor_pitch[max_bin] >= PI)
+				phasor_pitch[max_bin] -= 2.0 * PI;
+			while(phasor_pitch[max_bin] < -1.0*PI)
+				phasor_pitch[max_bin] += 2.0 * PI;
 		}
 
 		// shift the entire window spectrum
@@ -795,8 +789,7 @@ void VocoderFunc::VCO_contour(double ***Spectrum, int n, double *pitch)
 }
 
 void VocoderFunc::PitchShifting_KTH_HNM(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph, 
-										double *window_mag, double *window_pha, double pitch, 
-										FILE* myfile1, FILE* myfile2, int vowel_frame_index)
+										double *window_mag, double *window_pha, double pitch, int vowel_frame_index)
 {
 	int i, j, window_index, spec_index;
 	int DelFreqBin;
@@ -837,13 +830,6 @@ void VocoderFunc::PitchShifting_KTH_HNM(double **Spectrum, double PitchQuotient,
 	//ChannelGrouping(StudentMag, subband_pitch);
 	new_ChannelGrouping(StudentMag, subband_pitch, pitch);
 	
-for (i=0; i<FFT_SIZE/2+1; i++)
-{
-	if (i == subband_pitch[i])
-		fprintf(myfile1,"%d ",i);
-}
-fprintf(myfile2,"%d ",voiced_bin_th[vowel_frame_index]);
-
 	// iteratively subtract window spectrum from speech spectrum
 	for (i=0; i<voiced_bin_th[vowel_frame_index]; i++)
 	{
@@ -858,12 +844,12 @@ fprintf(myfile2,"%d ",voiced_bin_th[vowel_frame_index]);
 			peaks[peak_no] = i+DelFreqBin;
 			peak_no++;
 
-			phasor_pitch[i] = prev_phasor_pitch[prev_subband_pitch[i]] + (i*(PitchQuotient-1))*(2.0*my_PI*frame_shift)/FFT_SIZE;
+			phasor_pitch[i] = prev_phasor_pitch[prev_subband_pitch[i]] + (i*(PitchQuotient-1))*(2.0*PI*frame_shift)/FFT_SIZE;
 	
-			while(phasor_pitch[i] >= my_PI)
-				phasor_pitch[i] -= 2.0 * my_PI;
-			while(phasor_pitch[i] < -1.0*my_PI)
-				phasor_pitch[i] += 2.0 * my_PI;
+			while(phasor_pitch[i] >= PI)
+				phasor_pitch[i] -= 2.0 * PI;
+			while(phasor_pitch[i] < -1.0*PI)
+				phasor_pitch[i] += 2.0 * PI;
 			
 			// shift the entire window spectrum
 			max_amp = StudentMag[i];
@@ -1009,12 +995,12 @@ void VocoderFunc::PS_KTH_new(double **Spectrum, double PitchQuotient, int frame_
 		if (mark_phasor[max_bin] == false)
 		{
 			mark_phasor[max_bin] = true;
-			phasor_pitch[max_bin] = phasor_pitch[prev_subband_pitch[max_bin]] + (max_bin*(PitchQuotient-1))*(2.0*my_PI*frame_shift)/FFT_SIZE;
+			phasor_pitch[max_bin] = phasor_pitch[prev_subband_pitch[max_bin]] + (max_bin*(PitchQuotient-1))*(2.0*PI*frame_shift)/FFT_SIZE;
 
-			while(phasor_pitch[max_bin] >= my_PI)
-				phasor_pitch[max_bin] -= 2.0 * my_PI;
-			while(phasor_pitch[max_bin] < -1.0*my_PI)
-				phasor_pitch[max_bin] += 2.0 * my_PI;
+			while(phasor_pitch[max_bin] >= PI)
+				phasor_pitch[max_bin] -= 2.0 * PI;
+			while(phasor_pitch[max_bin] < -1.0*PI)
+				phasor_pitch[max_bin] += 2.0 * PI;
 		}
 
 		// shift the entire window spectrum
@@ -1132,10 +1118,10 @@ void VocoderFunc::TimeScaleMod(double rate, int FrameNum, double ***spectrogram,
 		{
 			ph[j] = prev_phase[j] + phasor_time[subband_time[j]];
 			
-			while(ph[j] >= my_PI)
-				ph[j] -= 2.0 * my_PI;
-			while(ph[j] < -1.0*my_PI)
-				ph[j] += 2.0 * my_PI;
+			while(ph[j] >= PI)
+				ph[j] -= 2.0 * PI;
+			while(ph[j] < -1.0*PI)
+				ph[j] += 2.0 * PI;
 			
 			new_spectrogram[0][0][j] = mag[j] * cos(ph[j]);
 			new_spectrogram[0][1][j] = mag[j] * sin(ph[j]);
@@ -1169,10 +1155,10 @@ void VocoderFunc::TimeScaleMod(double rate, int FrameNum, double ***spectrogram,
 							- atan2(spectrogram[f][1][prev_subband_time[j]],spectrogram[f][0][prev_subband_time[j]]);
 
 				ph[j] += phasor_time[j];
-				while(ph[j] >= my_PI)
-					ph[j] -= 2 * my_PI;
-				while(ph[j] < -1.0*my_PI)
-					ph[j] += 2 * my_PI;
+				while(ph[j] >= PI)
+					ph[j] -= 2 * PI;
+				while(ph[j] < -1.0*PI)
+					ph[j] += 2 * PI;
 			}
 		}
 
@@ -1183,10 +1169,10 @@ void VocoderFunc::TimeScaleMod(double rate, int FrameNum, double ***spectrogram,
 			{
 				ph[j] += phasor_time[subband_time[j]];
 			
-				while(ph[j] >= my_PI)
-					ph[j] -= 2.0 * my_PI;
-				while(ph[j] < -1.0*my_PI)
-					ph[j] += 2.0 * my_PI;
+				while(ph[j] >= PI)
+					ph[j] -= 2.0 * PI;
+				while(ph[j] < -1.0*PI)
+					ph[j] += 2.0 * PI;
 			}
 
 			new_spectrogram[i][0][j] = mag[j] * cos(ph[j]);
