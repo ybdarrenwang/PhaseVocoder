@@ -1,12 +1,7 @@
 #include <math.h>
 #include <stdlib.h>
-#include "Enhance.h"
+#include "enhance.h"
 
-#ifdef _DEBUG
-#undef THIS_FILE
-static char THIS_FILE[]=__FILE__;
-#define new DEBUG_NEW
-#endif
 /* manifest constants */
 #define WINTIME	0.030		/* process in 30ms windows */
 #define DBRANGE	40.0		/* dynamic range */

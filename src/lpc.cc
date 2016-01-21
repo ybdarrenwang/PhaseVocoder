@@ -2,10 +2,10 @@
 
 // calculate how many fundamental frequency vowel_marks needed
 // return: the number of vowel_marks
-int LPC::CalPath(int frame_no, int frame_shift, double *Pitch)
+int LPC::CalPath(int frame_no, int frame_shift, float *Pitch)
 {
 	int frame_ptr = 0, n = 0;
-	double vowel_marker = 0, T;
+	float vowel_marker = 0, T;
 
 	while(vowel_marker < frame_no*frame_shift)
 	{
@@ -25,7 +25,7 @@ int LPC::CalPath(int frame_no, int frame_shift, double *Pitch)
 				Pitch[frame_ptr] = Pitch[frame_ptr-1];
 		}
 
-		vowel_marker += (double)SamplingRate/Pitch[frame_ptr];
+		vowel_marker += (float)SamplingRate/Pitch[frame_ptr];
 		frame_ptr = floor(vowel_marker/frame_shift);
 		++n;
 	}
@@ -34,22 +34,22 @@ int LPC::CalPath(int frame_no, int frame_shift, double *Pitch)
 }
 
 // record the fundamental frequency vowel_marks
-void LPC::vowel_markPath(int *vowel_mark, int n, int frame_shift, double *Pitch)
+void LPC::vowel_markPath(int *vowel_mark, int n, int frame_shift, float *Pitch)
 {
 	int frame_ptr = 0;
-	double vowel_marker = 0, T;
+	float vowel_marker = 0, T;
 
 	for (int i=0; i<n; ++i)
 	{
 		vowel_mark[i] = floor(vowel_marker);
-		vowel_marker += (double)SamplingRate/Pitch[frame_ptr];
+		vowel_marker += (float)SamplingRate/Pitch[frame_ptr];
 		frame_ptr = floor(vowel_marker/frame_shift);
 	}
 }
 
-void LPC::SpecEnv(double *coeff, double *SpecEnv_mag, double *SpecEnv_pha)
+void LPC::SpecEnv(float *coeff, float *SpecEnv_mag, float *SpecEnv_pha)
 {
-    double A_real, A_imag;
+    float A_real, A_imag;
     int i,j;
 
     for (i=0; i<FFT_SIZE/2+1; ++i)
@@ -70,17 +70,17 @@ void LPC::SpecEnv(double *coeff, double *SpecEnv_mag, double *SpecEnv_pha)
 
 /* Input : n elements of time domain data
 Output: m lpc coefficients, excitation energy */
-double LPC::From_Data(double *data,double *lpc,int n,int m)
+float LPC::From_Data(float *data,float *lpc,int n,int m)
 {
-    double *aut= new double[m+1];
-    double error;
+    float *aut= new float[m+1];
+    float error;
     int i,j;
 
     /* autocorrelation, p+1 lag coefficients */
 
     j=m+1;
     while(j--){
-        double d=0;
+        float d=0;
         for(i=j;i<n;i++)d+=data[i]*data[i-j];
         aut[j]=d;
     }
@@ -89,12 +89,12 @@ double LPC::From_Data(double *data,double *lpc,int n,int m)
 
     error=aut[0];
     if(error==0){
-        memset(lpc,0,m*sizeof(double));
+        memset(lpc,0,m*sizeof(float));
         return 0;
     }
 
     for(i=0;i<m;i++){
-        double r=-aut[i+1];
+        float r=-aut[i+1];
 
         /* Sum up this iteration's reflection coefficient; note that in
            Vorbis we don't save it.  If anyone wants to recycle this code
@@ -108,7 +108,7 @@ double LPC::From_Data(double *data,double *lpc,int n,int m)
 
         lpc[i]=r;
         for(j=0;j<i/2;j++){
-            double tmp=lpc[j];
+            float tmp=lpc[j];
             lpc[j]+=r*lpc[i-1-j];
             lpc[i-1-j]+=r*tmp;
         }
@@ -123,15 +123,15 @@ double LPC::From_Data(double *data,double *lpc,int n,int m)
     return error;
 }
 
-void LPC::Predict(double *coeff,double *prime,int m,double *data,long n)
+void LPC::Predict(float *coeff,float *prime,int m,float *data,long n)
 {
     /* in: coeff[0...m-1] LPC coefficients 
        prime[0...m-1] initial values (allocated size of n+m-1)
 out: data[0...n-1] data samples */
 
     long i,j,o,p;
-    double y;
-    double *work = new double[m+n];
+    float y;
+    float *work = new float[m+n];
 
     if(!prime)
         for(i=0;i<m;i++)

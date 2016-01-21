@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "PhaseVocoder.h"
+#include "phase_vocoder.h"
 #include <stdio.h>
 #include <iostream>
 using namespace std;

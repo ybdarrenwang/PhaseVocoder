@@ -7,6 +7,7 @@
 #include <string.h>
 
 #define PI 3.14159265359
+#define DDC_PI (3.14159265358979323846)
 #define FFT_SIZE 4096
 #define SamplingRate 22050
 #define Atten_3dB 0.707945784

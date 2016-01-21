@@ -8,7 +8,7 @@ CDIR = cd
 MKDIR = mkdir -p
 RM = rm -f
 
-objects = $(BUILD)/main.o $(BUILD)/lpc.o $(BUILD)/VocoderFunctions.o $(BUILD)/SourceFilter.o
+objects = $(BUILD)/main.o $(BUILD)/vocoder_functions.o $(BUILD)/window.o $(BUILD)/time_stretcher.o $(BUILD)/overlap_adder.o $(BUILD)/pitch_shifter.o $(BUILD)/my_fft.o $(BUILD)/frame.o
 
 .PHONY : dir
 
@@ -20,7 +20,7 @@ dir:
 program: $(objects)
 	$(GPP) $(GPPFlag) -o PhaseVocoder.exe $^
 
-$(BUILD)/%.o: $(SRC)/%.cpp
+$(BUILD)/%.o: $(SRC)/%.cc
 	$(GPP) -c -o $@ $<
 
 .PHONY : clean
