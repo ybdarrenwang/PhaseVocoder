@@ -1,7 +1,16 @@
 #include "frame.h"
+#include "hamming_window.h"
+
+using namespace std;
         
-void Frame::RunFFT()
-{
+Window *Frame::window = new HammingWindow(FRAME_LENGTH);
+
+void Frame::loadSample(short* samples, int begin) {
+    for (int i=0; i<length; ++i)
+        frame[i] = (float)((int)samples[begin+i]);
+}
+
+void Frame::runFFT() {
     float *real;
     float *imag;
     fft.fft_float(length, false, frame, NULL, real, imag);
@@ -13,8 +22,7 @@ void Frame::RunFFT()
     }
 }
 
-void Frame::RunIFFT()
-{
+void Frame::runIFFT() {
     float *real = new float[length];
     float *imag = new float[length];
     float *imag_out = new float[length];

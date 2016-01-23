@@ -6,11 +6,15 @@
 class Window
 {
     public:
-        Window(int l) : length(l) {_window = new float[length];}
-        virtual ~Window() {delete _window;}
-        float* getHamming();
+        Window(int l) : length(l) {
+            _window = new float[length];
+        }
+        virtual ~Window() {
+            delete _window;
+        }
+        virtual void applyWindow(float* input);
 
-    private:
+    protected:
         int length;
         float* _window;
 };
