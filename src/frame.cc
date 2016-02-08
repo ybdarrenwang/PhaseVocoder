@@ -11,15 +11,15 @@ void Frame::loadSample(short* samples, int begin) {
 }
 
 void Frame::runFFT() {
-    float *real;
-    float *imag;
+    float *real = new float[length];
+    float *imag = new float[length];
     fft.fft_float(length, false, frame, NULL, real, imag);
-    delete spectrum;
-    spectrum = new Complex[length];
     for (int i=0; i<length; ++i) {
         spectrum[i].real = real[i];
         spectrum[i].imag = imag[i];
     }
+    delete real;
+    delete imag;
 }
 
 void Frame::runIFFT() {
