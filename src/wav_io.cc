@@ -49,7 +49,7 @@ bool WavFileIO::read()
 }
 
 // write out the wav file
-/*bool WavFileIO::save()
+bool WavFileIO::save()
 {
 	fstream myFile (myPath, ios::out | ios::binary);
 
@@ -68,10 +68,11 @@ bool WavFileIO::read()
 	myFile.write ((char*) &myBitsPerSample, 2);
 	myFile.write ("data", 4);
 	myFile.write ((char*) &myDataSize, 4);
-	
+	myFile.write (reinterpret_cast<char*>(myData_short), myDataSize);
+
 	return true;
 }
-*/
+
 // return a printable summary of the wav file
 char* WavFileIO::getSummary()
 {

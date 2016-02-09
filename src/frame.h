@@ -44,6 +44,8 @@ class Frame
 
         void setSpectrum(int freq, Complex spec) {spectrum[freq] = spec;}
 
+        float* getFrame() {return frame;}
+
     private:
         int length;
         float* frame;
