@@ -1,5 +1,7 @@
 #include "pitch_shifter.h"
 
+float PitchShifter::ABS2(float a,float b) {return sqrt(a*a+b*b);}
+
 // Find Max. Frequency Bin
 int find_max(float* a, int n, float threshold)
 {

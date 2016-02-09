@@ -1,7 +1,5 @@
 #include "vocoder_functions.h"
 
-float VocoderFunctions::ABS2(float a,float b) {return sqrt(a*a+b*b);}
-
 vector<float> VocoderFunctions::vectorWeightedSum(vector<float> v1, vector<float> v2, float w1, float w2) {
     if (w2==0) return v1;
     if (w1==0) return v2;
