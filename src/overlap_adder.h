@@ -6,10 +6,10 @@
 class OverlapAdder : public VocoderFunctions
 {
     public:
-        int PSOLA(double **frame, double *output, double *SentenceCoeff, double *windows,
-                int sample_index, double *Pitch, int WordStart, int WordMid, int WordEnd,
+        int PSOLA(float **frame, float *output, float *SentenceCoeff, float *windows,
+                int sample_index, float *Pitch, int WordStart, int WordMid, int WordEnd,
                 int frame_len, int frame_shift, int bias);
-        int SOLA(double **frame, double *output, double *SentenceCoeff, double *windows,
+        int SOLA(float **frame, float *output, float *SentenceCoeff, float *windows,
                 int sample_index, int WordStart, int WordMid, int WordEnd, 
                 int frame_len, int frame_shift, int bias);
 };

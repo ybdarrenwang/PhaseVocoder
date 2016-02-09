@@ -1,131 +1,58 @@
 #include "time_stretcher.h"
 
-// Calculate time path for time-scale mod.
-void CalPath(double *path, double rate, int ElementCount)
-{
-	for (int i=0; i<ElementCount; i++)
-	{
-		if (i==0)
-			path[i] = 0;
-		else
-			path[i] = path[i-1] + rate;
-	}
+/**
+* Phase-locked phase vocoder:
+* 1. Gather channels around each peak value into 1 group
+* 2. calculate the phase of each peak
+* 3. calculate the phase of the other channels with the peak's phasor
+*/
+void TimeStretcher::SynthesizePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph) {
+    vector<int> subband = groupChannel(mag);
+
+    for(int freq=0; freq<FFT_SIZE/2+1; ++freq)
+        if (freq==subband[freq])
+            phasor[freq] = phase[freq] - prev_phase[prev_subband[freq]];
+
+    for(int freq=0; freq<FFT_SIZE/2+1; ++freq)
+    {
+        synth_ph[freq] = prev_phase[freq] + phasor[subband[freq]];
+        while(synth_ph[freq] >= PI) synth_ph[freq] -= 2.0 * PI;
+        while(synth_ph[freq] < -1.0*PI) synth_ph[freq] += 2.0 * PI;
+        prev_subband[freq] = subband[freq]; // record previous sub-bands for scaled PL
+    }
 }
 
+Frame TimeStretcher::SynthesizeFrame(vector<float>& mag, vector<float>& ph){
+    Frame f(FFT_SIZE);
+    return f;
+}
 
-// ============================================================================ //
-// < Resampling on time axis >
-// ============================================================================ //
-void TimeStretcher::Stretch(double rate, int FrameNum, double ***spectrogram, 
-							   int new_FrameNum, double ***new_spectrogram, bool reset_ph)
-{
-	int i,j,f;
-	double a,b;
-	double mag[FFT_SIZE/2+1], ph[FFT_SIZE/2+1];
-	int subband_time[FFT_SIZE/2+1];
-	double *time_path = new double[new_FrameNum];
-	CalPath(time_path, rate, new_FrameNum);
+void TimeStretcher::Stretch(float rate, vector<Frame>& input_spec, vector<Frame>& output_spec, bool reset_phase) {
+    vector<float> mag, ph;
+    float sample_ptr = 0.0; // the pointer to the old spectrum, where the new
+                            // magnitude/phase should be synthesized from.
 
 	// initialize the first frame
-	for(j=0;j<FFT_SIZE/2+1;j++)
-		mag[j] = ABS2(spectrogram[0][0][j],spectrogram[0][1][j]);
+    mag = input_spec[0].getMagnitude();
 
-	if (reset_ph == true)
-	{
-		for(j=0;j<FFT_SIZE/2+1;j++)
-		{
-			ph[j] = atan2(spectrogram[0][1][j],spectrogram[0][0][j]);
-			new_spectrogram[0][0][j] = spectrogram[0][0][j];
-			new_spectrogram[0][1][j] = spectrogram[0][1][j];
-		}
-		ChannelGrouping(mag, prev_subband_time);
-	}
-	else
-	{
-		ChannelGrouping(mag, subband_time);
+	if (reset_phase) {
+        ph = input_spec[0].getPhase();
+        output_spec.push_back(input_spec[0]);
+        prev_subband = groupChannel(mag);
+    }
+    else {
+        SynthesizePhase(mag, input_spec[0].getPhase(), cached_phase, ph);
+        output_spec.push_back(SynthesizeFrame(mag, ph));
+    }
 
-		// calculate the phase of each peak
-		for(j=0;j<FFT_SIZE/2+1;j++)
-		{
-			// for synchronizing the phases around the peaks
-			// scaled PL
-			if (j==subband_time[j])
-				phasor_time[j] = atan2(spectrogram[0][1][j],spectrogram[0][0][j]) 
-								- prev_phase[prev_subband_time[j]];
-		}
+    for (int i=1; i<rate*input_spec.size(); ++i) {
+        sample_ptr += 1.0/rate;
+        mag = vectorWeightedSum(input_spec[(int)floor(sample_ptr)].getMagnitude(), input_spec[(int)ceil(sample_ptr)].getMagnitude(), ceil(sample_ptr)-sample_ptr, sample_ptr-floor(sample_ptr));
 
-		// calculate the phase of the other channels, and construct synthesis frame
-		for(j=0;j<FFT_SIZE/2+1;j++)
-		{
-			ph[j] = prev_phase[j] + phasor_time[subband_time[j]];
-			
-			while(ph[j] >= PI)
-				ph[j] -= 2.0 * PI;
-			while(ph[j] < -1.0*PI)
-				ph[j] += 2.0 * PI;
-			
-			new_spectrogram[0][0][j] = mag[j] * cos(ph[j]);
-			new_spectrogram[0][1][j] = mag[j] * sin(ph[j]);
+        SynthesizePhase(mag, input_spec[(int)ceil(sample_ptr)].getPhase(), input_spec[(int)floor(sample_ptr)].getPhase(), ph);
+        output_spec.push_back(SynthesizeFrame(mag, ph));
+    }
 
-			// record previous sub-bands for scaled PL
-			prev_subband_time[j] = subband_time[j];
-		}
-	}
-
-	for (i=1; i<new_FrameNum; i++) 
-	{
-		f = (int)time_path[i];
-		if (f >= FrameNum-1)
-			f = FrameNum-2;
-		b = time_path[i] - f;
-		a = 1 - b;
-		for(j=0;j<FFT_SIZE/2+1;j++)
-			mag[j] = a*ABS2(spectrogram[f][0][j],spectrogram[f][1][j]) 
-					+ b*ABS2(spectrogram[f+1][0][j],spectrogram[f+1][1][j]);
-
-		ChannelGrouping(mag, subband_time);
-
-		// calculate the phase of each peak
-		for(j=0;j<FFT_SIZE/2+1;j++)
-		{
-			if (j==subband_time[j])
-			{
-				// for synchronizing the phases around the peaks
-				// scaled PL
-				phasor_time[j] = atan2(spectrogram[f+1][1][j],spectrogram[f+1][0][j]) 
-							- atan2(spectrogram[f][1][prev_subband_time[j]],spectrogram[f][0][prev_subband_time[j]]);
-
-				ph[j] += phasor_time[j];
-				while(ph[j] >= PI)
-					ph[j] -= 2 * PI;
-				while(ph[j] < -1.0*PI)
-					ph[j] += 2 * PI;
-			}
-		}
-
-		// calculate the phase of the other channels, and construct synthesis frame
-		for(j=0;j<FFT_SIZE/2+1;j++)
-		{
-			if (j!=subband_time[j])
-			{
-				ph[j] += phasor_time[subband_time[j]];
-			
-				while(ph[j] >= PI)
-					ph[j] -= 2.0 * PI;
-				while(ph[j] < -1.0*PI)
-					ph[j] += 2.0 * PI;
-			}
-
-			new_spectrogram[i][0][j] = mag[j] * cos(ph[j]);
-			new_spectrogram[i][1][j] = mag[j] * sin(ph[j]);
-
-			// record previous sub-bands for scaled PL
-			prev_subband_time[j] = subband_time[j];
-		}
-	}
-	
-	for(j=0;j<FFT_SIZE/2+1;j++)
-		prev_phase[j] = ph[j];
-
-	delete [] time_path;
+    for(int freq=0;freq<FFT_SIZE/2+1;freq++)
+        cached_phase[freq] = ph[freq];
 }

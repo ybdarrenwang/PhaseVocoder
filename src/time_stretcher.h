@@ -2,16 +2,19 @@
 #define __TIMESTRETCHER_H__
 
 #include "vocoder_functions.h"
+#include "frame.h"
 
 class TimeStretcher : public VocoderFunctions
 {
     public:
-        void Stretch(double rate, int FrameNum, double ***spectrogram, int new_FrameNum, double ***new_spectrogram, bool reset_ph);
+        void SynthesizePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph);
+        Frame SynthesizeFrame(std::vector<float>&, std::vector<float>&);
+        void Stretch(float rate, vector<Frame>& input_spec, vector<Frame>& output_spec, bool reset_phase);
 
     private:
-        double phasor_time[FFT_SIZE/2+1];
-        int prev_subband_time[FFT_SIZE/2+1];
-        double prev_phase[FFT_SIZE/2+1];
+        vector<int> prev_subband; // the sub-band information from previous frame
+        vector<float> cached_phase; // the last phase spectrum from previous Stretch execution
+        vector<float> phasor; // the delta term for the phase of every frequency bin
 };
 
 #endif

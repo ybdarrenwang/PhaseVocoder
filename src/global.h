@@ -1,13 +1,14 @@
 #ifndef __GLOBAL_H__
 #define __GLOBAL_H__
 
-#include <math.h>
+#include <cmath>
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include <fstream>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <vector>
+#include <algorithm>
 
 #define PI 3.14159265359
 #define DDC_PI (3.14159265358979323846)
@@ -15,7 +16,5 @@
 #define SamplingRate 22050
 #define Atten_3dB 0.707945784
 #define order 16
-#define FRAME_LENGTH 4096
-#define FRAME_SHIFT 1024
 
 #endif

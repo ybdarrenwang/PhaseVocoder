@@ -3,17 +3,17 @@
 // ============================================================================ //
 //  < Pitch-Sync. Overlap-Add >
 // ============================================================================ //
-int OverlapAdder::PSOLA(double **frame, double *output, double *SentenceCoeff, double *windows,
-					  int sample_index, double *Pitch, int WordStart, int WordMid, int WordEnd,
+int OverlapAdder::PSOLA(float **frame, float *output, float *SentenceCoeff, float *windows,
+					  int sample_index, float *Pitch, int WordStart, int WordMid, int WordEnd,
 					  int frame_len, int frame_shift, int bias)
 {
 	int i,j,k;
 	int syn_bias; // a shift before overlap-add for pitch-sync
 	int total_syn_bias = 0;
 	int syn_sample_no;
-	double *frame_for_syn;
-	double cross_corr, max_cross_corr;
-	double T; // peroid in sample number
+	float *frame_for_syn;
+	float cross_corr, max_cross_corr;
+	float T; // peroid in sample number
 
 	for (i=0; i<WordMid-WordStart; i++)
 	{
@@ -27,9 +27,9 @@ int OverlapAdder::PSOLA(double **frame, double *output, double *SentenceCoeff, d
 
 	for (i=WordMid-WordStart; i<WordEnd-WordStart; i++)
 	{
-		T = floor((double)SamplingRate/Pitch[i-(WordMid-WordStart)]);
+		T = floor((float)SamplingRate/Pitch[i-(WordMid-WordStart)]);
 		syn_sample_no = bias;
-		frame_for_syn = new double[syn_sample_no];
+		frame_for_syn = new float[syn_sample_no];
 
 		if (sample_index-syn_sample_no >= 0)
 		{
@@ -71,7 +71,7 @@ int OverlapAdder::PSOLA(double **frame, double *output, double *SentenceCoeff, d
 // ============================================================================ //
 //  < Non-Pitch-Sync. Overlap-Add >
 // ============================================================================ //
-int OverlapAdder::SOLA(double **frame, double *output, double *SentenceCoeff, double *windows,
+int OverlapAdder::SOLA(float **frame, float *output, float *SentenceCoeff, float *windows,
 							int sample_index, int WordStart, int WordMid, int WordEnd, 
 							int frame_len, int frame_shift, int bias)
 {

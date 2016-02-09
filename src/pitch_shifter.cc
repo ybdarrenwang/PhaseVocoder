@@ -1,10 +1,10 @@
 #include "pitch_shifter.h"
 
 // Find Max. Frequency Bin
-int find_max(double* a, int n, double threshold)
+int find_max(float* a, int n, float threshold)
 {
 	int i, max_bin;
-	double max=0;
+	float max=0;
 	for (i=0; i<n; i++)
 	{
 		if (a[i]>max)
@@ -23,17 +23,17 @@ int find_max(double* a, int n, double threshold)
 // ============================================================================ //
 // < Resampling on Frequency Dimension >
 // ============================================================================ //
-void PitchShifter::PitchShifting(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph)
+void PitchShifter::PitchShifting(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph)
 {
 	int i;
 	int subband_pitch[FFT_SIZE/2+1];
 	int DelFreqBin[FFT_SIZE/2+1];
-	double PQResidual[FFT_SIZE/2+1]; // for interpolation
-	double energy=0, new_energy=0; // for energy preservation
+	float PQResidual[FFT_SIZE/2+1]; // for interpolation
+	float energy=0, new_energy=0; // for energy preservation
 
-	double **SpecTemp = new double *[2];
-	SpecTemp[0] = new double[FFT_SIZE/2+1];
-	SpecTemp[1] = new double[FFT_SIZE/2+1];
+	float **SpecTemp = new float *[2];
+	SpecTemp[0] = new float[FFT_SIZE/2+1];
+	SpecTemp[1] = new float[FFT_SIZE/2+1];
 
 	// initialization
 	if (reset_ph == true)
@@ -60,8 +60,8 @@ void PitchShifter::PitchShifting(double **Spectrum, double PitchQuotient, int fr
 	{
 		if (i==subband_pitch[i])
 		{
-			DelFreqBin[i] = floor((double)i*PitchQuotient) - i;
-			PQResidual[i] = (double)i*PitchQuotient - floor((double)i*PitchQuotient);
+			DelFreqBin[i] = floor((float)i*PitchQuotient) - i;
+			PQResidual[i] = (float)i*PitchQuotient - floor((float)i*PitchQuotient);
 
 			// cumulate the phasors
 			phasor_pitch[i] = phasor_pitch[prev_subband_pitch[i]] + (i*(PitchQuotient-1))*(2.0*PI*frame_shift)/FFT_SIZE;
@@ -109,7 +109,7 @@ void PitchShifter::PitchShifting(double **Spectrum, double PitchQuotient, int fr
 	// energy preservation
 	for (i=0; i<FFT_SIZE/2+1; i++)
 		new_energy += Spectrum[0][i]*Spectrum[0][i] + Spectrum[1][i]*Spectrum[1][i];
-	double AmpQuotient = sqrt(energy/new_energy);
+	float AmpQuotient = sqrt(energy/new_energy);
 	
 	for (i=0; i<FFT_SIZE/2+1; i++)
 	{
@@ -128,22 +128,22 @@ void PitchShifter::PitchShifting(double **Spectrum, double PitchQuotient, int fr
 // ============================================================================ //
 // < Pitch Shifting by KTH >
 // ============================================================================ //
-void PitchShifter::PitchShifting_KTH(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph, double *window, double pitch)
+void PitchShifter::PitchShifting_KTH(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph, float *window, float pitch)
 {
 	int i, j;
 //	int subband_pitch[FFT_SIZE/2+1];
 	int DelFreqBin;
-	double PQResidual; // for interpolation
-	double energy=0, new_energy=0; // for energy preservation
+	float PQResidual; // for interpolation
+	float energy=0, new_energy=0; // for energy preservation
 	int max_bin;
 	bool *mark_phasor = new bool[FFT_SIZE/2+1];
-	double max_amp;
+	float max_amp;
 	int iteration;
 
-	double **SpecTemp = new double *[2];
-	SpecTemp[0] = new double[FFT_SIZE/2+1];
-	SpecTemp[1] = new double[FFT_SIZE/2+1];
-	double *MagTemp = new double[FFT_SIZE/2+1];
+	float **SpecTemp = new float *[2];
+	SpecTemp[0] = new float[FFT_SIZE/2+1];
+	SpecTemp[1] = new float[FFT_SIZE/2+1];
+	float *MagTemp = new float[FFT_SIZE/2+1];
 
 	// initialization
 	for (i=0; i<FFT_SIZE/2+1; i++)
@@ -170,16 +170,16 @@ void PitchShifter::PitchShifting_KTH(double **Spectrum, double PitchQuotient, in
 	}
 
 	// iteratively subtract window spectrum from speech spectrum
-	iteration = floor(((double)SamplingRate/2.0)/pitch);
+	iteration = floor(((float)SamplingRate/2.0)/pitch);
 	for (i=0; i<iteration; i++)
 	{
 		max_bin = find_max(StudentMag, FFT_SIZE/2+1, 0);
 
 		// calculate phasor
-		DelFreqBin = floor((double)max_bin*PitchQuotient) - max_bin;
-		if ((double)max_bin*PitchQuotient-floor((double)max_bin*PitchQuotient) > 0.5)
+		DelFreqBin = floor((float)max_bin*PitchQuotient) - max_bin;
+		if ((float)max_bin*PitchQuotient-floor((float)max_bin*PitchQuotient) > 0.5)
 			DelFreqBin += 1;
-		PQResidual = (double)max_bin*PitchQuotient - floor((double)max_bin*PitchQuotient);
+		PQResidual = (float)max_bin*PitchQuotient - floor((float)max_bin*PitchQuotient);
 		
 		if (mark_phasor[max_bin] == false)
 		{
@@ -235,7 +235,7 @@ void PitchShifter::PitchShifting_KTH(double **Spectrum, double PitchQuotient, in
 	// energy preservation; cumulate the phasors
 	for (i=0; i<FFT_SIZE/2+1; i++)
 		new_energy += Spectrum[0][i]*Spectrum[0][i] + Spectrum[1][i]*Spectrum[1][i];
-	double AmpQuotient = sqrt(energy/new_energy);
+	float AmpQuotient = sqrt(energy/new_energy);
 	
 	for (i=0; i<FFT_SIZE/2+1; i++)
 	{
@@ -251,21 +251,21 @@ void PitchShifter::PitchShifting_KTH(double **Spectrum, double PitchQuotient, in
 	delete [] mark_phasor;
 }
 
-void PitchShifter::PitchShifting_KTH_HNM(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph, 
-										double *window_mag, double *window_pha, double pitch, int vowel_frame_index)
+void PitchShifter::PitchShifting_KTH_HNM(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph, 
+										float *window_mag, float *window_pha, float pitch, int vowel_frame_index)
 {
 	int i, j, window_index, spec_index;
 	int DelFreqBin;
-	double PQResidual; // for interpolation
-	double max_amp;
+	float PQResidual; // for interpolation
+	float max_amp;
 	int iteration;
 	int *peaks = new int[FFT_SIZE/2+1]; // record bin indices of spectral peaks
 	int peak_no = 0; // the number of peaks
 
 	int *subband_pitch = new int[FFT_SIZE/2+1];
-	double **SpecTemp = new double *[2];
-	SpecTemp[0] = new double[FFT_SIZE/2+1];
-	SpecTemp[1] = new double[FFT_SIZE/2+1];
+	float **SpecTemp = new float *[2];
+	SpecTemp[0] = new float[FFT_SIZE/2+1];
+	SpecTemp[1] = new float[FFT_SIZE/2+1];
 
 	// initialization
 	for (i=0; i<FFT_SIZE/2+1; i++)
@@ -290,8 +290,8 @@ void PitchShifter::PitchShifting_KTH_HNM(double **Spectrum, double PitchQuotient
 		StudentPha[i] = atan2(Spectrum[1][i], Spectrum[0][i]);
 	}
 
-	//ChannelGrouping(StudentMag, subband_pitch);
-	new_ChannelGrouping(StudentMag, subband_pitch, pitch);
+	ChannelGrouping(StudentMag, subband_pitch);
+	//new_ChannelGrouping(StudentMag, subband_pitch, pitch);
 	
 	// iteratively subtract window spectrum from speech spectrum
 	for (i=0; i<voiced_bin_th[vowel_frame_index]; i++)
@@ -299,8 +299,8 @@ void PitchShifter::PitchShifting_KTH_HNM(double **Spectrum, double PitchQuotient
 		if (i == subband_pitch[i])
 		{
 			// calculate phasor
-			DelFreqBin = floor((double)i*PitchQuotient) - i;
-			PQResidual = (double)i*PitchQuotient - floor((double)i*PitchQuotient);
+			DelFreqBin = floor((float)i*PitchQuotient) - i;
+			PQResidual = (float)i*PitchQuotient - floor((float)i*PitchQuotient);
 			if (PQResidual >= 0.5)
 				DelFreqBin += 1;
 			
@@ -393,9 +393,9 @@ void PitchShifter::PitchShifting_KTH_HNM(double **Spectrum, double PitchQuotient
 // < Fixed KTH approach >
 // ============================================================================ //
 
-double *MUL2(double r1, double i1, double r2, double i2) //multiplation of complex numbers
+float *MUL2(float r1, float i1, float r2, float i2) //multiplation of complex numbers
 {
-	double *ans = new double[2];
+	float *ans = new float[2];
 
 	ans[0] = r1*r2-i1*i2;
 	ans[1] = r1*i2+r2*i1;
@@ -403,22 +403,22 @@ double *MUL2(double r1, double i1, double r2, double i2) //multiplation of compl
 	return ans;
 }
 
-void PitchShifter::PS_KTH_new(double **Spectrum, double PitchQuotient, int frame_shift, bool reset_ph, 
-							 double *window_real, double *window_imag)
+void PitchShifter::PS_KTH_new(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph, 
+							 float *window_real, float *window_imag)
 {
 	int i, j;
 	int DelFreqBin;
-	double PQResidual; // for interpolation
-	double energy=0, new_energy=0; // for energy preservation
+	float PQResidual; // for interpolation
+	float energy=0, new_energy=0; // for energy preservation
 	int max_bin;
 	bool *mark_phasor = new bool[FFT_SIZE/2+1];
-	double max_amp_real, max_amp_imag, threshold;
-//	double *ROI, *ROI_shift; // region of influence
+	float max_amp_real, max_amp_imag, threshold;
+//	float *ROI, *ROI_shift; // region of influence
 
-	double **SpecTemp = new double *[2];
-	SpecTemp[0] = new double[FFT_SIZE/2+1];
-	SpecTemp[1] = new double[FFT_SIZE/2+1];
-	double *MagTemp = new double[FFT_SIZE/2+1];
+	float **SpecTemp = new float *[2];
+	SpecTemp[0] = new float[FFT_SIZE/2+1];
+	SpecTemp[1] = new float[FFT_SIZE/2+1];
+	float *MagTemp = new float[FFT_SIZE/2+1];
 //AfxMessageBox("start");
 	// initialization
 	for (i=0; i<FFT_SIZE/2+1; i++)
@@ -450,10 +450,10 @@ void PitchShifter::PS_KTH_new(double **Spectrum, double PitchQuotient, int frame
 	while (max_bin != -1)
 	{
 		// calculate phasor
-		DelFreqBin = floor((double)max_bin*PitchQuotient) - max_bin;
-//		if ((double)max_bin*PitchQuotient-floor((double)max_bin*PitchQuotient) > 0.5)
+		DelFreqBin = floor((float)max_bin*PitchQuotient) - max_bin;
+//		if ((float)max_bin*PitchQuotient-floor((float)max_bin*PitchQuotient) > 0.5)
 //			DelFreqBin += 1;
-		PQResidual = (double)max_bin*PitchQuotient - floor((double)max_bin*PitchQuotient);
+		PQResidual = (float)max_bin*PitchQuotient - floor((float)max_bin*PitchQuotient);
 		
 		if (mark_phasor[max_bin] == false)
 		{
@@ -473,11 +473,11 @@ void PitchShifter::PS_KTH_new(double **Spectrum, double PitchQuotient, int frame
 		{
 			if (j-max_bin+FFT_SIZE/2 >= 0 && j-max_bin+FFT_SIZE/2 < FFT_SIZE) // subtract window spectrum from original spectrum
 			{
-				double *ROI = MUL2(max_amp_real, max_amp_imag, window_real[j-max_bin+FFT_SIZE/2], window_imag[j-max_bin+FFT_SIZE/2]);
+				float *ROI = MUL2(max_amp_real, max_amp_imag, window_real[j-max_bin+FFT_SIZE/2], window_imag[j-max_bin+FFT_SIZE/2]);
 //fprintf(myfile,"%f + %f*i\n",ROI[0],ROI[1]);
 				if (j+DelFreqBin >=0 && j+DelFreqBin < FFT_SIZE/2) // shift the entire window spectrum
 				{
-					double *ROI_shift = MUL2(ROI[0], ROI[1], cos(phasor_pitch[max_bin]), sin(phasor_pitch[max_bin]));
+					float *ROI_shift = MUL2(ROI[0], ROI[1], cos(phasor_pitch[max_bin]), sin(phasor_pitch[max_bin]));
 
 /*					SpecTemp[0][j+DelFreqBin] += ROI_real_shift;
 					SpecTemp[1][j+DelFreqBin] += ROI_imag_shift;*/
@@ -519,7 +519,7 @@ void PitchShifter::PS_KTH_new(double **Spectrum, double PitchQuotient, int frame
 	// energy preservation; cumulate the phasors
 	for (i=0; i<FFT_SIZE/2+1; i++)
 		new_energy += Spectrum[0][i]*Spectrum[0][i] + Spectrum[1][i]*Spectrum[1][i];
-	double AmpQuotient = sqrt(energy/new_energy);
+	float AmpQuotient = sqrt(energy/new_energy);
 	
 	for (i=0; i<FFT_SIZE/2+1; i++)
 	{
@@ -534,3 +534,204 @@ void PitchShifter::PS_KTH_new(double **Spectrum, double PitchQuotient, int frame
 	delete [] SpecTemp;
 	delete [] mark_phasor;
 }
+
+// ============================================================================ //
+// < Voice cut-off frequency estimation >
+// Reference: Applying the Harmonic Plus Noise Model in Concatenative Speech Synthesis, page3
+// ============================================================================ //
+int PitchShifter::VCO_estimation(float *Mag, int *harmonic_peak, float f0)
+{
+	// parameter setting
+	float VCO_lb = 1000, VCO_ub = 8000; // the upper/lower bound of VCO
+	int n = 3; // if n consecutive harmonics are unvoiced, then set VCO
+
+	int i, j, harmonic_no=0, bin_index, VCO;
+	int ChannelGroup[FFT_SIZE/2+1];
+	float max_minor_mag, central_freq, residual;
+
+	// record the bin index of harmonic bins
+	for (i=0; i<FFT_SIZE/2+1; i++)
+	{
+		if (i == harmonic_peak[i])
+			harmonic_no++;
+	}
+	
+	int *harmonic_bin = new int[harmonic_no];
+	bool *harmonic_voiced = new bool[harmonic_no];
+	for (i=0; i<harmonic_no; i++)
+		harmonic_voiced[i] = 0;
+
+	j = 0;
+	for (i=0; i<FFT_SIZE/2+1; i++)
+	{
+		if (i == harmonic_peak[i])
+		{
+			harmonic_bin[j] = i;
+			j++;
+		}
+	}
+
+	// determine how much bins to look forward/backward
+	float bin_period = FFT_SIZE/(SamplingRate/f0); // f0 interval width counted by bin number
+	int find_max_range = (int)floor(bin_period*0.5);
+
+	// determine voiced/unvoiced harmonic peaks using peakiness
+	ChannelGrouping(Mag, ChannelGroup); // locate minor peaks
+	for (i=0; i<harmonic_no; i++)
+	{
+		// find max{A(omega-i)}
+		max_minor_mag = 0;
+		for (j=-1*find_max_range; j<=find_max_range; j++)
+		{
+			bin_index = harmonic_bin[i]+j;
+			if (bin_index == ChannelGroup[bin_index] && j!=0)
+			{
+				if (Mag[bin_index] > max_minor_mag)
+					max_minor_mag = Mag[bin_index];
+			}
+		}
+		
+		if (Mag[harmonic_bin[i]]/max_minor_mag > 4 // A(omega-c)-max(A(omega-i)) > 6dB
+			|| max_minor_mag == 0) // there's no other peaks
+			harmonic_voiced[i] = 1;
+	}
+/*	FILE* myfile=fopen("harmonic-1.txt","w");
+	for (i=0; i<harmonic_no; i++)
+		fprintf(myfile,"%d, %d\n",harmonic_bin[i], harmonic_voiced[i]);
+	fclose(myfile);*/
+
+	// determine voiced/unvoiced harmonic peaks using the location of harmonics
+//	myfile=fopen("harmonic-2.txt","w");
+	for (i=0; i<harmonic_no; i++)
+	{
+		central_freq = SamplingRate*((float)harmonic_bin[i]/FFT_SIZE);
+		residual = central_freq/f0 - floor(central_freq/f0);
+		if (residual > 0.5)
+			residual = 1-residual;
+
+		if (residual < 0.1)
+		{
+			harmonic_voiced[i] = 1;
+//			fprintf(myfile,"%d, %d\n",harmonic_bin[i], 1);
+		}
+//		else
+//			fprintf(myfile,"%d, %d\n",harmonic_bin[i], 0);
+	}
+//	fclose(myfile);
+
+/*	myfile=fopen("harmonic.txt","w");
+	for (i=0; i<harmonic_no; i++)
+		fprintf(myfile,"%d, %d\n",harmonic_bin[i], harmonic_voiced[i]);
+	fclose(myfile);*/
+
+	// set the harmonics beneath lower bound be voiced
+/*	i = 0;
+	while(harmonic_bin[i] < (VCO_lb/SamplingRate)*FFT_SIZE)
+	{
+		harmonic_voiced[i] = 1;
+		i++;
+	}
+	// set the harmonics exceed upper bound be unvoiced
+	i = harmonic_no-1;
+	while(harmonic_bin[i] > (VCO_ub/SamplingRate)*FFT_SIZE)
+	{
+		harmonic_voiced[i] = 0;
+		i--;
+	}*/
+
+	// if n consecutive harmonics are unvoiced, then set VCO
+	i = 0;
+	while(harmonic_voiced[i] == 1 && i+n-1<harmonic_no)
+	{
+		i++;
+		for (j=0; j<n; j++)
+		{
+			if (harmonic_voiced[i+j] == 1)
+				harmonic_voiced[i] = 1;
+		}
+	}
+//	VCO = SamplingRate*(float)harmonic_bin[i-1]/FFT_SIZE;
+	VCO = harmonic_bin[i-1];
+	if (VCO < (VCO_lb/SamplingRate)*FFT_SIZE || // lower bound
+		VCO > (VCO_ub/SamplingRate)*FFT_SIZE) // upper bound
+		VCO = 0;
+
+//AfxMessageBox("VCO");
+
+	delete [] harmonic_bin;
+	delete [] harmonic_voiced;
+
+	return VCO;
+}
+
+// ============================================================================ //
+// < Pitch shifting, combining HNM >
+// ============================================================================ //
+
+void PitchShifter::VCO_contour(float ***Spectrum, int n, float *pitch)
+{
+	int i, j, counter;
+	float a,average_bin_th = 0;
+	int *subband_pitch;
+
+	voiced_bin_th = new int[n];
+
+	// calculate VCO
+	for (i=0; i<n; i++)
+	{
+		for (j=0; j<FFT_SIZE/2+1; j++)
+			StudentMag[j] = ABS2(Spectrum[i][0][j],Spectrum[i][1][j]);
+
+		subband_pitch = new int[FFT_SIZE/2+1];
+		new_ChannelGrouping(StudentMag, subband_pitch, pitch[i]);
+		voiced_bin_th[i] = VCO_estimation(StudentMag, subband_pitch, pitch[i]);
+		delete [] subband_pitch;
+	}
+
+	// VCO contour smoothing
+/*	for (i=0; i<n; i++)
+	{
+		if (voiced_bin_th[i] > 0)
+		{
+			average_bin_th += voiced_bin_th[i];
+			counter++;
+		}
+	}
+	average_VCO/=counter;*/
+	
+	// interpolation
+	for (i=0; i<n; i++)
+	{
+		if (voiced_bin_th[i] == 0)
+		{
+			if (i == 0) // if the first voiced_bin_th has no value
+			{
+				while(voiced_bin_th[i] == 0)
+					i++;
+				while(i > 0 && i < n)
+				{
+					voiced_bin_th[i-1] = voiced_bin_th[i];
+					i--;
+				}	
+			}	
+			else // interpolation
+			{
+				counter = 0;
+				while(i+counter < n && voiced_bin_th[i+counter] == 0)
+					counter++;
+
+				if (i+counter < n)
+					a = (float)(voiced_bin_th[i+counter]-voiced_bin_th[i-1])/(counter+1);
+				else // if the last frame has no pitch
+					a = 0;
+
+				while(i < n && voiced_bin_th[i] == 0)
+				{
+					voiced_bin_th[i] = (int)floor(voiced_bin_th[i-1] + a);
+					i++;
+				}
+			}
+		}
+	}
+}
+

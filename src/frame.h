@@ -5,6 +5,8 @@
 #include "complex.h"
 #include "window.h"
 
+using namespace std;
+
 class Frame
 {
     public:
@@ -12,21 +14,35 @@ class Frame
             frame = new float[length];
             spectrum = new Complex[length];
         }
+
         virtual ~Frame() {
-            delete frame;
-            delete spectrum;
+            if (frame) delete frame;
+            if (spectrum) delete spectrum;
         }
+
         void loadSample(short* samples, int begin);
-        void applyWindow() {window->applyWindow(frame);}
-        void runFFT();
-        void runIFFT();
+        void applyWindow(Window* window) {window->applyWindow(frame);}
+        void runFFT(MyFFT* fft);
+        void runIFFT(MyFFT* fft);
+
+        vector<float> getMagnitude() {
+            vector<float> ans;
+            for (int i=0; i<length/2+1; ++i)
+                ans.push_back(spectrum[i].getMagnitude());
+            return ans;
+        }
+
+        vector<float> getPhase() {
+            vector<float> ans;
+            for (int i=0; i<length/2+1; ++i)
+                ans.push_back(spectrum[i].getPhase());
+            return ans;
+        }
 
     private:
         int length;
         float* frame;
         Complex* spectrum;
-        MyFFT fft;
-        static Window *window;
 };
 
 #endif
