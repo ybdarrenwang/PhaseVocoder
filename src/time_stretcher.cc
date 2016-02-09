@@ -7,7 +7,7 @@
 * 3. calculate the phase of the other channels with the peak's phasor
 */
 void TimeStretcher::SynthesizePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph) {
-    vector<int> subband = groupChannel(mag);
+    vector<int> subband = vocoder_func->groupChannel(mag);
 
     for(int freq=0; freq<FFT_SIZE/2+1; ++freq)
         if (freq==subband[freq])
@@ -40,7 +40,7 @@ void TimeStretcher::Stretch(float rate, vector<Frame*>& input_spec, vector<Frame
 	if (reset_phase) {
         ph = input_spec[0]->getPhase();
         output_spec.push_back(input_spec[0]);
-        prev_subband = groupChannel(mag);
+        prev_subband = vocoder_func->groupChannel(mag);
     }
     else {
         f = new Frame(FFT_SIZE);

@@ -41,6 +41,7 @@ vector<int> VocoderFunctions::groupChannel(vector<float>& spec) {
     peak_idx.push_back(peak_ptr);
     return peak_idx;
 }
+
 /*
 void VocoderFunctions::new_ChannelGrouping(float *Spec, int *ChannelGroupFlag, float pitch)
 {
