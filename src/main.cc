@@ -1,5 +1,5 @@
 #include "time_stretcher.h"
-#include "time_stretcher_phase_locked.h"
+#include "time_stretcher_pl.h"
 #include "pitch_shifter.h"
 #include "complex.h"
 #include "window.h"

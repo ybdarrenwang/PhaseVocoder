@@ -1,4 +1,4 @@
-#include "time_stretcher_phase_locked.h"
+#include "time_stretcher_pl.h"
 
 /**
 * Phase-locked phase vocoder:

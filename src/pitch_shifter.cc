@@ -67,10 +67,8 @@ void PitchShifter::Shift(float factor, vector<Frame*>& input_spec, vector<Frame*
     vector<float> mag, ph;
     Frame *f;
 
-    // initialization
     if (reset_phase)
-        for (int i=0; i<FFT_SIZE/2+1; i++)
-        {
+        for (int i=0; i<FFT_SIZE/2+1; i++) {
             phasor[i] = 0;
             prev_subband[i] = i;
         }
