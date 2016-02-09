@@ -3,8 +3,8 @@
 float VocoderFunctions::ABS2(float a,float b) {return sqrt(a*a+b*b);}
 
 vector<float> VocoderFunctions::vectorWeightedSum(vector<float> v1, vector<float> v2, float w1, float w2) {
-    if (w1==0) return v2;
     if (w2==0) return v1;
+    if (w1==0) return v2;
     vector<float> ans;
     if (v1.size()!=v2.size()) return ans;
     for (int i=0; i<v1.size(); ++i)

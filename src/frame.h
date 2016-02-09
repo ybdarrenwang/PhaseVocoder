@@ -16,6 +16,7 @@ class Frame
         }
 
         virtual ~Frame() {
+            cout<<"delete frame"<<endl;
             if (frame) delete frame;
             if (spectrum) delete spectrum;
         }
@@ -38,6 +39,10 @@ class Frame
                 ans.push_back(spectrum[i].getPhase());
             return ans;
         }
+
+        Complex getSpectrum(int freq) {return spectrum[freq];}
+
+        void setSpectrum(int freq, Complex spec) {spectrum[freq] = spec;}
 
     private:
         int length;

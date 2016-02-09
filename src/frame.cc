@@ -10,7 +10,7 @@ void Frame::loadSample(short* samples, int begin) {
 void Frame::runFFT(MyFFT* fft) {
     float *real = new float[length];
     float *imag = new float[length];
-    fft->fft_float(length, false, frame, NULL, real, imag);
+    fft->fft_float(false, frame, NULL, real, imag);
     for (int i=0; i<length; ++i) {
         spectrum[i].real = real[i];
         spectrum[i].imag = imag[i];
@@ -27,7 +27,7 @@ void Frame::runIFFT(MyFFT* fft) {
         real[i] = spectrum[i].real;
         imag[i] = spectrum[i].imag;
     }
-    fft->fft_float(length, true, real, imag, frame, imag_out);
+    fft->fft_float(true, real, imag, frame, imag_out);
     delete real;
     delete imag;
     delete imag_out;

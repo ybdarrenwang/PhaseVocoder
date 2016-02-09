@@ -6,9 +6,12 @@
 class MyFFT  
 {
     public:
-        MyFFT(){}
+        MyFFT(unsigned n) : NumSamples(n) {}
         virtual ~MyFFT(){}
-        void fft_float(unsigned  NumSamples, bool InverseTransform, float *RealIn, float *ImagIn, float *RealOut, float *ImagOut);
+        void fft_float(bool InverseTransform, float *RealIn, float *ImagIn, float *RealOut, float *ImagOut);
+
+    private:
+        unsigned NumSamples;
         unsigned NumberOfBitsNeeded ( unsigned PowerOfTwo );
         unsigned ReverseBits (unsigned index, unsigned NumBits);
 };

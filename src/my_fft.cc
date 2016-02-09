@@ -1,6 +1,6 @@
 #include "my_fft.h"
 
-void MyFFT::fft_float(unsigned  NumSamples, bool InverseTransform, float *RealIn, float *ImagIn, float *RealOut, float *ImagOut)
+void MyFFT::fft_float(bool InverseTransform, float *RealIn, float *ImagIn, float *RealOut, float *ImagOut)
 {
 	unsigned NumBits;    /* Number of bits needed to store indices */
 	unsigned i, j, k, n;
