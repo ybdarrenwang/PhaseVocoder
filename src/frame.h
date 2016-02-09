@@ -29,6 +29,12 @@ class Frame
         vector<float> getMagnitude();
         vector<float> getPhase();
         Complex getSpectrum(int freq) {return spectrum[freq];}
+        void setSpectrum(Complex* _spectrum) {
+            for (int freq=0; freq<length/2+1; ++freq)
+                spectrum[freq] = _spectrum[freq];
+            for (int freq=length/2+1; freq<length; ++freq)
+                spectrum[freq] = spectrum[length-freq];
+        }
         void setSpectrum(int freq, Complex spec) {spectrum[freq] = spec;}
 
         float* getFrame() {return frame;}

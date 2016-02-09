@@ -1,5 +1,6 @@
 #include "time_stretcher.h"
 #include "time_stretcher_phase_locked.h"
+#include "pitch_shifter.h"
 #include "complex.h"
 #include "window.h"
 #include "hamming_window.h"
@@ -18,6 +19,7 @@ int main(int argc, char **argv) {
     int FRAME_SHIFT = 1024;
     int FFT_SIZE = FRAME_LENGTH;
     float ts_rate = 0.5;
+    float ps_rate = 2;
 
     Window *window = new HammingWindow(FRAME_LENGTH);
     MyFFT *fft = new MyFFT(FFT_SIZE);
@@ -41,8 +43,14 @@ int main(int argc, char **argv) {
     // Time stretching
     cout<<"Time stretching"<<endl;
     TimeStretcher *ts = new TimeStretcherPL(FFT_SIZE);
+    vector<Frame*> tmp_recording;
+    ts->Stretch(ts_rate, recording, tmp_recording, true);
+
+    // Pitch shifting
+    cout<<"Pitch shifting"<<endl;
+    PitchShifter *ps = new PitchShifter(FFT_SIZE, FRAME_SHIFT);
     vector<Frame*> synth_recording;
-    ts->Stretch(ts_rate, recording, synth_recording, true);
+    ps->Shift(ps_rate, tmp_recording, synth_recording, true);
 
     // Synthesis
     cout<<"Synthesis"<<endl;

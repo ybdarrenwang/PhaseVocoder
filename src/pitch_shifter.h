@@ -2,23 +2,35 @@
 #define __PITCHSHIFTER_H__
 
 #include "vocoder_functions.h"
+#include "frame.h"
+
+using namespace std;
 
 class PitchShifter : public VocoderFunctions
 {
     public:
-        float ABS2(float a,float b);
-        void VCO_contour(float ***Spectrum, int n, float *pitch);
-        int VCO_estimation(float *Mag, int *harmonic_peak, float f0);
-        void PitchShifting(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph);
-        void PitchShifting_KTH(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph, float *window, float pitch);
-        void PitchShifting_KTH_HNM(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph, 
-                float *window_mag, float *window_pha, float pitch, int vowel_frame_index);
-        void PS_KTH_new(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph, float *window_real, float *window_imag);
+        PitchShifter(int n, int s) : FFT_SIZE(n), FRAME_SHIFT(s) {
+            phasor = vector<float>(n/2+1, 0.0);
+            for (int i=0; i<n/2+1; ++i)
+                prev_subband.push_back(i);
+            vocoder_func = new VocoderFunctions();
+            freq_bin_shift = vector<int>(n/2+1, 0.0);
+            phase_shift_residual = vector<float>(n/2+1, 0.0); // for interpolation
+        }
+
+        void UpdatePhase(vector<float>& mag, vector<float>& synth_ph, float factor);
+        void SynthesizeFrame(vector<float>& mag, vector<float>& ph, Frame *f);
+        void Shift(float factor, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase);
+        //void Shift(float **Spectrum, float PitchQuotient, int frame_shift, bool reset_ph);
 
     private:
-        float phasor_pitch[FFT_SIZE/2+1];
-        float prev_phasor_pitch[FFT_SIZE/2+1];
-        int prev_subband_pitch[FFT_SIZE/2+1];
+        int FFT_SIZE;
+        int FRAME_SHIFT;
+        vector<float> phasor; // the delta term for the phase of every frequency bin
+        vector<int> prev_subband;
+        VocoderFunctions* vocoder_func;
+        vector<int> freq_bin_shift;
+        vector<float> phase_shift_residual; // for interpolation
 };
 
 #endif

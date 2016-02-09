@@ -8,7 +8,8 @@ class Complex
     public:
         Complex() : real(0.0), imag(0.0) {}
         Complex(float r, float i) : real(r), imag(i) {}
-        float getMagnitude(){return sqrt(real*real+imag*imag);}
+        float getEnergy(){return real*real+imag*imag;}
+        float getMagnitude(){return sqrt(getEnergy());}
         float getPhase(){return atan2(imag, real);}
         float real;
         float imag;

@@ -8,7 +8,7 @@ CDIR = cd
 MKDIR = mkdir -p
 RM = rm -f
 
-objects = $(BUILD)/main.o $(BUILD)/vocoder_functions.o $(BUILD)/window.o $(BUILD)/time_stretcher.o $(BUILD)/my_fft.o $(BUILD)/frame.o $(BUILD)/wav_io.o $(BUILD)/time_stretcher_phase_locked.o
+objects = $(BUILD)/main.o $(BUILD)/vocoder_functions.o $(BUILD)/window.o $(BUILD)/time_stretcher.o $(BUILD)/my_fft.o $(BUILD)/frame.o $(BUILD)/wav_io.o $(BUILD)/time_stretcher_phase_locked.o $(BUILD)/pitch_shifter.o
 
 .PHONY : dir
 

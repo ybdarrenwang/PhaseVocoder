@@ -6,7 +6,7 @@
 * 2. calculate the phase of each peak
 * 3. calculate the phase of the other channels with the peak's phasor
 */
-void TimeStretcherPL::SynthesizePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph) {
+void TimeStretcherPL::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph) {
     vector<int> subband = vocoder_func->groupChannel(mag);
 
     for(int freq=0; freq<FFT_SIZE/2+1; ++freq)

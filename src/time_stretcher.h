@@ -16,7 +16,7 @@ class TimeStretcher
         }
         virtual ~TimeStretcher() { delete vocoder_func; }
 
-        void SynthesizePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph);
+        void UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph);
         void SynthesizeFrame(vector<float>&, vector<float>&, Frame*);
         void Stretch(float rate, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase);
 
