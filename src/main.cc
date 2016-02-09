@@ -1,4 +1,5 @@
 #include "time_stretcher.h"
+#include "time_stretcher_phase_locked.h"
 #include "complex.h"
 #include "window.h"
 #include "hamming_window.h"
@@ -12,7 +13,7 @@ int main(int argc, char **argv) {
     // Initialize parameters and functions
     cout<<"Initialize parameters and functions"<<endl;
     string input_file = "test/HungarianDanceNo5.wav";
-    string output_file = "test/tmp.wav";
+    string output_file = "test/tmp_pl.wav";
     int FRAME_LENGTH = 4096;
     int FRAME_SHIFT = 1024;
     int FFT_SIZE = FRAME_LENGTH;
@@ -39,9 +40,9 @@ int main(int argc, char **argv) {
 
     // Time stretching
     cout<<"Time stretching"<<endl;
-    TimeStretcher ts(FFT_SIZE);
+    TimeStretcher *ts = new TimeStretcherPL(FFT_SIZE);
     vector<Frame*> synth_recording;
-    ts.Stretch(ts_rate, recording, synth_recording, true);
+    ts->Stretch(ts_rate, recording, synth_recording, true);
 
     // Synthesis
     cout<<"Synthesis"<<endl;

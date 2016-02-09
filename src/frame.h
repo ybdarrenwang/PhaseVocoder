@@ -26,22 +26,9 @@ class Frame
         void runFFT(MyFFT* fft);
         void runIFFT(MyFFT* fft);
 
-        vector<float> getMagnitude() {
-            vector<float> ans;
-            for (int i=0; i<length/2+1; ++i)
-                ans.push_back(spectrum[i].getMagnitude());
-            return ans;
-        }
-
-        vector<float> getPhase() {
-            vector<float> ans;
-            for (int i=0; i<length/2+1; ++i)
-                ans.push_back(spectrum[i].getPhase());
-            return ans;
-        }
-
+        vector<float> getMagnitude();
+        vector<float> getPhase();
         Complex getSpectrum(int freq) {return spectrum[freq];}
-
         void setSpectrum(int freq, Complex spec) {spectrum[freq] = spec;}
 
         float* getFrame() {return frame;}

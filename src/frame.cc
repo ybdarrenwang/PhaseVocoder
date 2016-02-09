@@ -32,3 +32,17 @@ void Frame::runIFFT(MyFFT* fft) {
     delete imag;
     delete imag_out;
 }
+
+vector<float> Frame::getMagnitude() {
+    vector<float> ans;
+    for (int i=0; i<length/2+1; ++i)
+        ans.push_back(spectrum[i].getMagnitude());
+    return ans;
+}
+
+vector<float> Frame::getPhase() {
+    vector<float> ans;
+    for (int i=0; i<length/2+1; ++i)
+        ans.push_back(spectrum[i].getPhase());
+    return ans;
+}
