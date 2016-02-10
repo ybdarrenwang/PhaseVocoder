@@ -1,31 +1,18 @@
 #include "pitch_shifter.h"
 
 void PitchShifter::UpdatePhase(vector<float>& mag, vector<float>& synth_ph, float factor) {
-    // allocate region-of-influence for sinusoid freq. tracking
-    vector<int> subband = vocoder_func->groupChannel(mag);
-
-    // calculate the phasor and bin number to shift for each peak
-    for(int i=0;i<FFT_SIZE/2+1;i++)
-        if (i==subband[i]) {
-            freq_bin_shift[i] = floor(i*factor) - i;
-            phase_shift_residual[i] = i*factor-floor(i*factor);
-            phasor[i] = phasor[prev_subband[i]] + (i*(factor-1))*(2.0*PI*FRAME_SHIFT)/FFT_SIZE;
-            while(phasor[i] >= PI) phasor[i] -= 2.0 * PI;
-            while(phasor[i] < -1.0*PI) phasor[i] += 2.0 * PI;
-        }
-
     // update phase and other cached info
     for(int i=0;i<FFT_SIZE/2+1;i++)
     {
-        phasor[i] = phasor[subband[i]];
-        phase_shift_residual[i] = phase_shift_residual[subband[i]];
-        freq_bin_shift[i] = freq_bin_shift[subband[i]];
+        freq_bin_shift[i] = floor(i*factor) - i;
+        phase_shift_residual[i] = i*factor-floor(i*factor);
+        phasor[i] += (i*(factor-1))*(2.0*PI*FRAME_SHIFT)/FFT_SIZE;
+        while(phasor[i] >= PI) phasor[i] -= 2.0 * PI;
+        while(phasor[i] < -1.0*PI) phasor[i] += 2.0 * PI;
 
         synth_ph[i] += phasor[i];
         while (synth_ph[i] >= PI) synth_ph[i] -= 2.0 * PI;
         while (synth_ph[i] < -1.0*PI) synth_ph[i] += 2.0 * PI;
-
-        prev_subband[i] = subband[i];
     }
 }
 
@@ -70,7 +57,7 @@ void PitchShifter::Shift(float factor, vector<Frame*>& input_spec, vector<Frame*
     if (reset_phase)
         for (int i=0; i<FFT_SIZE/2+1; i++) {
             phasor[i] = 0;
-            prev_subband[i] = i;
+            //prev_subband[i] = i;
         }
 
     for (int sample_idx=0; sample_idx<input_spec.size(); ++sample_idx) {

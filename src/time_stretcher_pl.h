@@ -20,7 +20,7 @@ class TimeStretcherPL : public TimeStretcher
         }
         virtual ~TimeStretcherPL() {}
 
-        void UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph);
+        void UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph);
 
     protected:
         vector<int> prev_subband; // the sub-band information from previous frame

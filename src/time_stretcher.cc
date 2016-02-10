@@ -1,8 +1,8 @@
 #include "time_stretcher.h"
 
-void TimeStretcher::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph) {
+void TimeStretcher::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph) {
     for(int freq=0; freq<FFT_SIZE/2+1; ++freq) {
-        phasor[freq] = phase[freq] - prev_phase[freq];
+        phasor[freq] = next_phase[freq] - prev_phase[freq];
         synth_ph[freq] += phasor[freq];
         while(synth_ph[freq] >= PI) synth_ph[freq] -= 2.0 * PI;
         while(synth_ph[freq] < -1.0*PI) synth_ph[freq] += 2.0 * PI;
@@ -25,19 +25,22 @@ void TimeStretcher::Stretch(float rate, vector<Frame*>& input_spec, vector<Frame
         float prev_frame_weight = 1-(sample_ptr-(int)sample_ptr);
         int next_frame_idx = prev_frame_idx+1;
         float next_frame_weight = 1-prev_frame_weight;
+
         mag = vocoder_func->vectorWeightedSum(input_spec[prev_frame_idx]->getMagnitude(), input_spec[next_frame_idx]->getMagnitude(), prev_frame_weight, next_frame_weight);
+
         f = new Frame(FFT_SIZE);
         if (output_spec.size()>0)
-            UpdatePhase(mag, input_spec[next_frame_idx]->getPhase(), input_spec[prev_frame_idx]->getPhase(), ph);
+            UpdatePhase(mag, input_spec[prev_frame_idx]->getPhase(), input_spec[next_frame_idx]->getPhase(), ph);
         else // initialize the first frame
             if (reset_phase)
                 ph = input_spec[0]->getPhase();
             else {
                 ph = cached_phase;
-                UpdatePhase(mag, input_spec[0]->getPhase(), cached_phase, ph);
+                UpdatePhase(mag, cached_phase, input_spec[0]->getPhase(), ph);
             }
         SynthesizeFrame(mag, ph, f);
         output_spec.push_back(f);
+
         sample_ptr += 1.0/rate;
     }
 

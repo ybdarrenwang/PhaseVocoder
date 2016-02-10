@@ -5,13 +5,15 @@
 * 1. Gather channels around each peak value into 1 group
 * 2. calculate the phase of each peak
 * 3. calculate the phase of the other channels with the peak's phasor
+* 
+* Note: so far sounds worse than ordinary time stretching; to find out why
 */
-void TimeStretcherPL::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> phase, vector<float>& synth_ph) {
+void TimeStretcherPL::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph) {
     vector<int> subband = vocoder_func->groupChannel(mag);
 
     for(int freq=0; freq<FFT_SIZE/2+1; ++freq)
         if (freq==subband[freq])
-            phasor[freq] = phase[freq] - prev_phase[prev_subband[freq]];
+            phasor[freq] = next_phase[freq] - prev_phase[prev_subband[freq]];
 
     for(int freq=0; freq<FFT_SIZE/2+1; ++freq)
     {
