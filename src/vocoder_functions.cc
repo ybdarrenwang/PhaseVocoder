@@ -2,6 +2,16 @@
 
 float VocoderFunctions::ABS2(float a,float b) {return sqrt(a*a+b*b);}
 
+/**
+ * Return: instantaneous frequency
+*/
+float VocoderFunctions::phaseUnwrapping(float delta_phase, int freq_bin) {
+    delta_phase -= 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
+    while(delta_phase >= PI) delta_phase -= 2.0 * PI;
+    while(delta_phase < -1.0*PI) delta_phase += 2.0 * PI;
+    return delta_phase + 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
+}
+
 vector<float> VocoderFunctions::vectorWeightedSum(vector<float> v1, vector<float> v2, float w1, float w2) {
     if (w2==0) return v1;
     if (w1==0) return v2;
@@ -33,6 +43,7 @@ vector<int> VocoderFunctions::groupChannel(vector<float>& spec) {
             for (int j=valley_ptr; j<i; ++j)
                 peak_idx[j] = i;
             peak_ptr = i;
+            valley_ptr = i;
         }
         else // otherwise: update valley if necessary
             if (spec[i]<spec[valley_ptr])

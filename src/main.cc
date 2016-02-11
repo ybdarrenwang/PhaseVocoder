@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
     // Initialize parameters and functions
     cout<<"Initialize parameters and functions"<<endl;
     string input_file = "test/HungarianDanceNo5.wav";
-    string output_file = "test/tmp_pl.wav";
+    string output_file = "test/tmp.wav";
     int FRAME_LENGTH = 4096;
     int FRAME_SHIFT = 1024;
     int FFT_SIZE = FRAME_LENGTH;
@@ -29,6 +29,7 @@ int main(int argc, char **argv) {
     // Read wave file
     cout<<"Read wave file"<<endl;
     WavFileIO* wav = new WavFileIO(input_file.c_str());
+    int sampling_rate = wav->mySampleRate;
 
     // Framing
     cout<<"Framing"<<endl;
@@ -44,7 +45,7 @@ int main(int argc, char **argv) {
 
     // Time stretching
     cout<<"Time stretching"<<endl;
-    TimeStretcher *ts = new TimeStretcherPL(FFT_SIZE, FRAME_SHIFT);
+    TimeStretcher *ts = new TimeStretcher(FFT_SIZE, FRAME_SHIFT);
     vector<Frame*> tmp_recording;
     ts->Stretch(ts_rate, recording, tmp_recording, true);
 

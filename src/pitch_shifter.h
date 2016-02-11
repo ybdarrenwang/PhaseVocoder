@@ -6,7 +6,7 @@
 
 using namespace std;
 
-class PitchShifter : public VocoderFunctions
+class PitchShifter
 {
     public:
         PitchShifter(int n, int s) : FFT_SIZE(n), FRAME_SHIFT(s) {
@@ -15,7 +15,7 @@ class PitchShifter : public VocoderFunctions
                 freq_bin_shift.push_back(0);
                 phase_shift_residual.push_back(0.0);
             }
-            vocoder_func = new VocoderFunctions();
+            vocoder_func = new VocoderFunctions(n, s);
         }
 
         virtual void UpdatePhase(vector<float>& mag, vector<float>& synth_ph, float factor);

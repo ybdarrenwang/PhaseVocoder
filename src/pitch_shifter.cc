@@ -6,13 +6,8 @@ void PitchShifter::UpdatePhase(vector<float>& mag, vector<float>& synth_ph, floa
     {
         freq_bin_shift[i] = floor(i*factor) - i;
         phase_shift_residual[i] = i*factor-floor(i*factor);
-        phasor[i] += (i*(factor-1))*(2.0*PI*FRAME_SHIFT)/FFT_SIZE;
-        while(phasor[i] >= PI) phasor[i] -= 2.0 * PI;
-        while(phasor[i] < -1.0*PI) phasor[i] += 2.0 * PI;
-
-        synth_ph[i] += phasor[i];
-        while (synth_ph[i] >= PI) synth_ph[i] -= 2.0 * PI;
-        while (synth_ph[i] < -1.0*PI) synth_ph[i] += 2.0 * PI;
+        phasor[i] = fmod(phasor[i]+(i*(factor-1))*(2.0*PI*FRAME_SHIFT)/FFT_SIZE, 2.0*PI);
+        synth_ph[i] = fmod(synth_ph[i]+phasor[i], 2.0*PI);
     }
 }
 

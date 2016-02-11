@@ -9,9 +9,7 @@ void PitchShifterPL::UpdatePhase(vector<float>& mag, vector<float>& synth_ph, fl
         if (i==subband[i]) {
             freq_bin_shift[i] = floor(i*factor) - i;
             phase_shift_residual[i] = i*factor-floor(i*factor);
-            phasor[i] = phasor[prev_subband[i]] + (i*(factor-1))*(2.0*PI*FRAME_SHIFT)/FFT_SIZE;
-            while(phasor[i] >= PI) phasor[i] -= 2.0 * PI;
-            while(phasor[i] < -1.0*PI) phasor[i] += 2.0 * PI;
+            phasor[i] = fmod(phasor[prev_subband[i]]+(i*(factor-1))*(2.0*PI*FRAME_SHIFT)/FFT_SIZE, 2.0*PI);
         }
 
     // update phase and other cached info
@@ -20,11 +18,7 @@ void PitchShifterPL::UpdatePhase(vector<float>& mag, vector<float>& synth_ph, fl
         phasor[i] = phasor[subband[i]];
         phase_shift_residual[i] = phase_shift_residual[subband[i]];
         freq_bin_shift[i] = freq_bin_shift[subband[i]];
-
-        synth_ph[i] += phasor[i];
-        while (synth_ph[i] >= PI) synth_ph[i] -= 2.0 * PI;
-        while (synth_ph[i] < -1.0*PI) synth_ph[i] += 2.0 * PI;
-
+        synth_ph[i] = fmod(synth_ph[i]+phasor[i], 2.0*PI);
         prev_subband[i] = subband[i];
     }
 }

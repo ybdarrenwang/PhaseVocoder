@@ -9,10 +9,10 @@ using namespace std;
 class TimeStretcher
 {
     public:
-        TimeStretcher(int n) : FFT_SIZE(n) {
+        TimeStretcher(int n, int s) : FFT_SIZE(n), FRAME_SHIFT(s) {
             cached_phase = vector<float>(n/2+1,0);
             phasor = vector<float>(n/2+1,0);
-            vocoder_func = new VocoderFunctions();
+            vocoder_func = new VocoderFunctions(n, s);
         }
         virtual ~TimeStretcher() { delete vocoder_func; }
 
@@ -22,6 +22,7 @@ class TimeStretcher
 
     protected:
         int FFT_SIZE;
+        int FRAME_SHIFT;
         vector<float> cached_phase; // the last phase spectrum from previous Stretch execution
         vector<float> phasor; // the delta term for the phase of every frequency bin
         VocoderFunctions* vocoder_func;

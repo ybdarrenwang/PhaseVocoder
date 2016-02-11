@@ -3,9 +3,7 @@
 void TimeStretcher::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph) {
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin) {
         phasor[freq_bin] = next_phase[freq_bin] - prev_phase[freq_bin];
-        synth_ph[freq_bin] += phasor[freq_bin];
-        while(synth_ph[freq_bin] >= PI) synth_ph[freq_bin] -= 2.0 * PI;
-        while(synth_ph[freq_bin] < -1.0*PI) synth_ph[freq_bin] += 2.0 * PI;
+        synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+phasor[freq_bin], 2.0*PI);
     }
 }
 
