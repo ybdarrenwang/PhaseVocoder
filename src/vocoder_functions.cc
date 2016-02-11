@@ -2,9 +2,6 @@
 
 float VocoderFunctions::ABS2(float a,float b) {return sqrt(a*a+b*b);}
 
-/**
- * Return: instantaneous frequency
-*/
 float VocoderFunctions::phaseUnwrapping(float delta_phase, int freq_bin) {
     delta_phase -= 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
     while(delta_phase >= PI) delta_phase -= 2.0 * PI;

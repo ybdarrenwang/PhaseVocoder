@@ -1,7 +1,6 @@
 #include "time_stretcher.h"
 #include "time_stretcher_pl.h"
 #include "pitch_shifter.h"
-#include "pitch_shifter_pl.h"
 #include "complex.h"
 #include "window.h"
 #include "hamming_window.h"
@@ -15,13 +14,14 @@ int main(int argc, char **argv) {
     // Initialize parameters and functions
     cout<<"Initialize parameters and functions"<<endl;
     string input_file = "test/HungarianDanceNo5.wav";
-    string output_file = "test/tmp.wav";
+    string output_file = "test/tmp_pl.wav";
     int FRAME_LENGTH = 4096;
     int FRAME_SHIFT = 1024;
     int FFT_SIZE = FRAME_LENGTH;
-    float ts_rate = 2;
-    //float ps_rate = 1.125;
-    float ps_rate = 1;
+    //float ts_rate = 2;
+    float ts_rate = 1;
+    float ps_rate = 1.125;
+    //float ps_rate = 1;
 
     Window *window = new HammingWindow(FRAME_LENGTH);
     MyFFT *fft = new MyFFT(FFT_SIZE);

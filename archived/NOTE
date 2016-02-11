@@ -1,4 +1,4 @@
-These codes are for pitch shifting algorithms from:
+Most of these codes are for pitch shifting algorithms from:
 
 Petkov, Petko N., and W. Bastiaan Kleijn. "Improving the Phase Vocoder Approach to Pitch-Shifting." INTERSPEECH 2007: 8TH ANNUAL CONFERENCE OF THE INTERNATIONAL SPEECH COMMUNICATION ASSOCIATION, VOLS 1-4. 2007.
 
@@ -19,3 +19,7 @@ Derived classes:
 - Iteratively subtract window spectrum from speech spectrum
 - (added by myself) assume known pitch -> known number of delta functions
 - Use voice cutoff frequency (VCO)
+
+---
+
+On the other hand, the class PitchShifterPL applies the phase locking technique originally used in time stretching into pitch shifting. The outcome is not satisfying though.

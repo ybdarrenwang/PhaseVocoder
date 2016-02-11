@@ -9,9 +9,9 @@ using namespace std;
 * Phase-locked phase vocoder:
 * 1. Gather channels around each peak value into 1 group
 * 2. calculate the phase of each peak
-* 3. calculate the phase of the other channels with the peak's phasor
+* 3. calculate the phase of the other channels by maintaining the difference between their phases to peak's phasor
 * 
-* Note: so far sounds worse than ordinary time stretching; to find out why
+* Note: sounds worse than ordinary time stretching; to find out why
 */
 class TimeStretcherPL : public TimeStretcher
 {

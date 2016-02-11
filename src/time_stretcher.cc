@@ -1,10 +1,8 @@
 #include "time_stretcher.h"
 
 void TimeStretcher::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph) {
-    for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin) {
-        phasor[freq_bin] = next_phase[freq_bin] - prev_phase[freq_bin];
-        synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+phasor[freq_bin], 2.0*PI);
-    }
+    for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
+        synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+next_phase[freq_bin]-prev_phase[freq_bin], 2.0*PI);
 }
 
 void TimeStretcher::SynthesizeFrame(vector<float>& mag, vector<float>& ph, Frame* f){

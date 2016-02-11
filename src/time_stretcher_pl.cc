@@ -5,13 +5,14 @@ void TimeStretcherPL::UpdatePhase(vector<float> mag, vector<float> prev_phase, v
 
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
         if (freq_bin==subband[freq_bin]) {
-            phasor[freq_bin] = next_phase[freq_bin]-prev_phase[freq_bin];
-            //phasor[freq_bin] = (next_phase[freq_bin]-prev_phase[prev_subband[freq_bin]]) + (freq_bin-prev_subband[freq_bin])*2.0*PI*FRAME_SHIFT/FFT_SIZE;
+            //float delta_phase = next_phase[freq_bin]-prev_phase[prev_subband[freq_bin]];
+            float delta_phase = next_phase[freq_bin]-prev_phase[freq_bin];
+            synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+vocoder_func->phaseUnwrapping(delta_phase, freq_bin), 2.0*PI);
     }
 
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
-    {
-        synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+phasor[subband[freq_bin]], 2.0*PI);
-        prev_subband[freq_bin] = subband[freq_bin];
-    }
+        if (freq_bin!=subband[freq_bin])
+            synth_ph[freq_bin] = fmod(synth_ph[subband[freq_bin]]+next_phase[freq_bin]-next_phase[subband[freq_bin]], 2.0*PI);
+
+    prev_subband = subband;
 }
