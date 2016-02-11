@@ -10,18 +10,71 @@
 
 using namespace std;
 
+void usage( const char *prog ) {
+    cout << endl
+        << "Usage: "<<prog<<" [options] ..."<<endl<<endl
+        << "options:"<<endl
+        << " -t TIME_SCALE_FACTOR  (>1 for slowdown, <1 for speedup) [default:1]"<<endl
+        << " -p PITCH_SCALE_FACTOR (>1 for higher, <1 for lower)     [default:1]"<<endl
+        << " -i INPUT_WAVE_FILE_PATH"<<endl
+        << " -o SYNTHESIZED_WAVE_FILE_PATH"<<endl<<endl;
+    exit(1);
+}
+
+void readConfig(vector<string> &Args, float &ts_rate, float &ps_rate, string &input_file, string &output_file) {
+    for(int i=0; i<Args.size(); ++i) {
+        if( Args[i] == "-t" && Args.size() > i ) {
+            ++i;
+            stringstream ss(Args[i]);
+            ss >> ts_rate;
+        }
+        else if( Args[i] == "-p" && Args.size() > i )
+        {
+            ++i;
+            stringstream ss(Args[i]);
+            ss >> ps_rate;
+        }
+        else if( Args[i] == "-i" && Args.size() > i ) {
+            ++i;
+            input_file = Args[i];
+        }
+        else if( Args[i] == "-o" && Args.size() > i ) {
+            ++i;
+            output_file = Args[i];
+        }
+    }
+}
+
 int main(int argc, char **argv) {
+    if( argc < 2 ){
+        usage( argv[0] );
+        exit(0);
+    }
+
+    // Read arguments
+    string input_file = "";
+    string output_file = "";
+    float ts_rate = 1;
+    float ps_rate = 1;
+
+    vector<string> Args;
+    for(int i=1; i<argc; ++i)
+    {
+        string tmpstr(argv[i]);
+        Args.push_back( tmpstr );
+    }
+    readConfig(Args, ts_rate, ps_rate, input_file, output_file);
+    if (input_file=="" || output_file=="") {
+        cerr<<"ERROR: input or output file not specified"<<endl;
+        exit(1);
+    }
+    cout<<input_file<<" -> "<<output_file<<endl;
+
     // Initialize parameters and functions
     cout<<"Initialize parameters and functions"<<endl;
-    string input_file = "test/HungarianDanceNo5.wav";
-    string output_file = "test/tmp_pl.wav";
     int FRAME_LENGTH = 4096;
     int FRAME_SHIFT = 1024;
     int FFT_SIZE = FRAME_LENGTH;
-    //float ts_rate = 2;
-    float ts_rate = 1;
-    float ps_rate = 1.125;
-    //float ps_rate = 1;
 
     Window *window = new HammingWindow(FRAME_LENGTH);
     MyFFT *fft = new MyFFT(FFT_SIZE);
@@ -82,6 +135,6 @@ int main(int argc, char **argv) {
     wav->myData_short = &synth_signal[0];
     wav->save();
 
-    cout<<"end"<<endl;
+    cout<<"Complete!"<<endl;
     return 0;
 }

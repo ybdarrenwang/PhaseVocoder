@@ -6,7 +6,7 @@ BUILD = build
 
 CDIR = cd
 MKDIR = mkdir -p
-RM = rm -f
+RM = rm -rf
 
 objects = $(BUILD)/main.o $(BUILD)/vocoder_functions.o $(BUILD)/window.o $(BUILD)/time_stretcher.o $(BUILD)/my_fft.o $(BUILD)/frame.o $(BUILD)/wav_io.o $(BUILD)/time_stretcher_pl.o $(BUILD)/pitch_shifter.o
 
@@ -25,4 +25,4 @@ $(BUILD)/%.o: $(SRC)/%.cc
 
 .PHONY : clean
 clean:
-	$(RM) $(BUILD)/*
+	$(RM) $(BUILD)
