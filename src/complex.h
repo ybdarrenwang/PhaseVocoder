@@ -11,6 +11,7 @@ class Complex
         float getEnergy(){return real*real+imag*imag;}
         float getMagnitude(){return sqrt(getEnergy());}
         float getPhase(){return atan2(imag, real);}
+        Complex getConjugate(){return Complex(real, -1*imag);}
         float real;
         float imag;
 };

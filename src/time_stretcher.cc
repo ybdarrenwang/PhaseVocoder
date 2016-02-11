@@ -1,19 +1,19 @@
 #include "time_stretcher.h"
 
 void TimeStretcher::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph) {
-    for(int freq=0; freq<FFT_SIZE/2+1; ++freq) {
-        phasor[freq] = next_phase[freq] - prev_phase[freq];
-        synth_ph[freq] += phasor[freq];
-        while(synth_ph[freq] >= PI) synth_ph[freq] -= 2.0 * PI;
-        while(synth_ph[freq] < -1.0*PI) synth_ph[freq] += 2.0 * PI;
+    for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin) {
+        phasor[freq_bin] = next_phase[freq_bin] - prev_phase[freq_bin];
+        synth_ph[freq_bin] += phasor[freq_bin];
+        while(synth_ph[freq_bin] >= PI) synth_ph[freq_bin] -= 2.0 * PI;
+        while(synth_ph[freq_bin] < -1.0*PI) synth_ph[freq_bin] += 2.0 * PI;
     }
 }
 
 void TimeStretcher::SynthesizeFrame(vector<float>& mag, vector<float>& ph, Frame* f){
-    for(int freq=0; freq<FFT_SIZE/2+1; ++freq)
-        f->setSpectrum(freq, Complex(mag[freq]*cos(ph[freq]), mag[freq]*sin(ph[freq])));
-    for(int freq=FFT_SIZE/2+1; freq<FFT_SIZE; ++freq)
-        f->setSpectrum(freq, f->getSpectrum(FFT_SIZE-freq));
+    for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
+        f->setSpectrum(freq_bin, Complex(mag[freq_bin]*cos(ph[freq_bin]), mag[freq_bin]*sin(ph[freq_bin])));
+    for(int freq_bin=FFT_SIZE/2+1; freq_bin<FFT_SIZE; ++freq_bin)
+        f->setSpectrum(freq_bin, f->getSpectrum(FFT_SIZE-freq_bin).getConjugate());
 }
 
 void TimeStretcher::Stretch(float rate, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase) {
@@ -44,6 +44,6 @@ void TimeStretcher::Stretch(float rate, vector<Frame*>& input_spec, vector<Frame
         sample_ptr += 1.0/rate;
     }
 
-    for(int freq=0; freq<FFT_SIZE/2+1; ++freq)
-        cached_phase[freq] = ph[freq];
+    for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
+        cached_phase[freq_bin] = ph[freq_bin];
 }

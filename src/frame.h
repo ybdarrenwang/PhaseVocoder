@@ -33,7 +33,7 @@ class Frame
             for (int freq=0; freq<length/2+1; ++freq)
                 spectrum[freq] = _spectrum[freq];
             for (int freq=length/2+1; freq<length; ++freq)
-                spectrum[freq] = spectrum[length-freq];
+                spectrum[freq] = spectrum[length-freq].getConjugate();
         }
         void setSpectrum(int freq, Complex spec) {spectrum[freq] = spec;}
 

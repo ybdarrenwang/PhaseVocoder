@@ -20,7 +20,8 @@ int main(int argc, char **argv) {
     int FRAME_SHIFT = 1024;
     int FFT_SIZE = FRAME_LENGTH;
     float ts_rate = 2;
-    float ps_rate = 1.125;
+    //float ps_rate = 1.125;
+    float ps_rate = 1;
 
     Window *window = new HammingWindow(FRAME_LENGTH);
     MyFFT *fft = new MyFFT(FFT_SIZE);
@@ -43,13 +44,13 @@ int main(int argc, char **argv) {
 
     // Time stretching
     cout<<"Time stretching"<<endl;
-    TimeStretcher *ts = new TimeStretcher(FFT_SIZE);
+    TimeStretcher *ts = new TimeStretcherPL(FFT_SIZE, FRAME_SHIFT);
     vector<Frame*> tmp_recording;
     ts->Stretch(ts_rate, recording, tmp_recording, true);
 
     // Pitch shifting
     cout<<"Pitch shifting"<<endl;
-    PitchShifter *ps = new PitchShifterPL(FFT_SIZE, FRAME_SHIFT);
+    PitchShifter *ps = new PitchShifter(FFT_SIZE, FRAME_SHIFT);
     vector<Frame*> synth_recording;
     ps->Shift(ps_rate, tmp_recording, synth_recording, true);
 
