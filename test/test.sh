@@ -17,3 +17,7 @@
 
 # 1 Whole step lower
 ../PhaseVocoder.exe -p 0.889 -i HungarianDanceNo5.wav -o lower_pitch.wav
+
+../PhaseVocoder.exe -p 0.889 -t 1.5 -i HungarianDanceNo5.wav -o tmp1.wav
+
+../PhaseVocoder.exe -p 1.125 -t 0.7 -i HungarianDanceNo5.wav -o tmp2.wav --phaselock

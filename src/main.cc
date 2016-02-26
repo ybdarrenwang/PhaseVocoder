@@ -1,12 +1,7 @@
-#include "time_stretcher.h"
-#include "time_stretcher_pl.h"
-#include "pitch_shifter.h"
-#include "complex.h"
-#include "window.h"
-#include "hamming_window.h"
-#include "frame.h"
-#include "wav_io.h"
-#include <iostream>
+#include "phasevocoder.h"
+
+#define FRAME_LENGTH 4096
+#define FRAME_SHIFT 1024
 
 using namespace std;
 
@@ -75,86 +70,16 @@ int main(int argc, char **argv) {
     }
     cout<<endl<<"[ "<<input_file<<" -> "<<output_file<<" ]"<<endl;
 
-    // Initialize parameters and functions
-    cout<<"Initialize parameters and functions"<<endl;
-    int FRAME_LENGTH = 4096;
-    int FRAME_SHIFT = 1024;
-    int FFT_SIZE = FRAME_LENGTH;
+    // Execute
+    PhaseVocoder *pv = new PhaseVocoder(FRAME_LENGTH, FRAME_SHIFT, phase_lock);
+    pv->ReadWave(input_file);
+    pv->Analysis();
+    pv->TimeStretching(ts_rate);
+    pv->PitchShifting(ps_rate);
+    pv->Synthesis();
+    pv->WriteWave(output_file);
+    delete pv;
 
-    Window *window = new HammingWindow(FRAME_LENGTH);
-    MyFFT *fft = new MyFFT(FFT_SIZE);
-
-    // Read wave file
-    cout<<"Read wave file"<<endl;
-    WavFileIO* input_wav = new WavFileIO(input_file);
-    int sampling_rate = input_wav->mySampleRate;
-
-    // Framing
-    cout<<"Framing"<<endl;
-    vector<Frame*> recording;
-    int num_frame = (input_wav->myDataSize/2-FRAME_LENGTH)/FRAME_SHIFT+1;
-    for (int frame_idx=0; frame_idx<num_frame; ++frame_idx) {
-        Frame *f = new Frame(FRAME_LENGTH);
-        f->loadSample(input_wav->myData_short, frame_idx*FRAME_SHIFT);
-        f->applyWindow(window);
-        f->runFFT(fft);
-        recording.push_back(f);
-    }
-
-    // Time stretching
-    cout<<"Time stretching"<<endl;
-    TimeStretcher *ts;
-    if (phase_lock)
-        ts = new TimeStretcherPL(FFT_SIZE, FRAME_SHIFT);
-    else
-        ts = new TimeStretcher(FFT_SIZE, FRAME_SHIFT);
-    vector<Frame*> tmp_recording;
-    ts->Stretch(ts_rate, recording, tmp_recording, true);
-
-    // Pitch shifting
-    cout<<"Pitch shifting"<<endl;
-    PitchShifter *ps = new PitchShifter(FFT_SIZE, FRAME_SHIFT);
-    vector<Frame*> synth_recording;
-    ps->Shift(ps_rate, tmp_recording, synth_recording, true);
-
-    // Synthesis
-    cout<<"Synthesis"<<endl;
-
-    vector<double> square_window(FRAME_LENGTH, 1.0); // for the denominator in synthesis
-    window->applyWindow(&square_window[0]);
-    window->applyWindow(&square_window[0]);
-
-    int synth_size = input_wav->myDataSize/2*ts_rate;
-    vector<short> synth_signal(synth_size, 0);
-    vector<double> synth_normalize_coeff(synth_size, 0.0);
-    for (int frame_idx=0; frame_idx<synth_recording.size(); ++frame_idx) {
-        synth_recording[frame_idx]->runIFFT(fft);
-        synth_recording[frame_idx]->applyWindow(window);
-        double *frame = synth_recording[frame_idx]->getFrame();
-        for (int sample_idx=0; sample_idx<FRAME_LENGTH && frame_idx*FRAME_SHIFT+sample_idx<synth_size; ++sample_idx) {
-            synth_signal[frame_idx*FRAME_SHIFT+sample_idx]+=frame[sample_idx];
-            synth_normalize_coeff[frame_idx*FRAME_SHIFT+sample_idx]+=square_window[sample_idx];
-        }
-    }
-    for (int i=0; i<synth_size; ++i)
-        synth_signal[i]/=synth_normalize_coeff[i];
-
-    // Write wav file
-    WavFileIO* output_wav = new WavFileIO(*input_wav);
-    output_wav->setPath(output_file);
-    output_wav->myDataSize = synth_size*2;
-    output_wav->myData_short = &synth_signal[0]; // note: delete output_wav cause double deletion!!!
-    output_wav->save();
-
-    // Release memory
-    delete window;
-    delete fft;
-    delete input_wav;
-    delete ts;
-    delete ps;
-    for (vector<Frame*>::iterator f=recording.begin(); f!=recording.end(); ++f) delete (*f);
-    for (vector<Frame*>::iterator f=tmp_recording.begin(); f!=tmp_recording.end(); ++f) delete (*f);
-    for (vector<Frame*>::iterator f=synth_recording.begin(); f!=synth_recording.end(); ++f) delete (*f);
     cout<<"Complete!"<<endl;
     return 0;
 }

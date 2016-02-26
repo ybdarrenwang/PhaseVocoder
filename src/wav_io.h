@@ -70,8 +70,8 @@ class WavFileIO
 
         ~WavFileIO()
         {
-            if (myData != NULL) delete [] myData;
-            if (myData_short != NULL) delete [] myData_short;
+            //if (myData) delete [] myData;
+            if (myData_short) delete [] myData_short;
         }
 
         string getPath() {return myPath;}
@@ -88,7 +88,7 @@ class WavFileIO
 
         // I made this public so that you can toss whatever you want in here
         // maybe a recorded buffer, maybe just whatever you want
-        char* myData;
+        //char* myData;
         short* myData_short;
         int myDataSize; // because the read() function has been "reinterpreted"
                         // from "char" into "short", the original size is for "char"!!!
