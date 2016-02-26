@@ -35,8 +35,7 @@ class PhaseVocoder {
         int sampling_rate;
         double ts_rate;
         double ps_rate;
-        vector<Frame*> input_recording;
-        vector<Frame*> output_recording;
+        vector<Frame*> spectrogram;
         short* synth_signal;
         int synth_size;
 };
