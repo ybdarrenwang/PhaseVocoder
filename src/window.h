@@ -6,13 +6,16 @@
 class Window
 {
     public:
-        Window(int l) : length(l) { _window = new float[length]; }
+        Window(int l) : length(l) { _window = new double[length]; }
         virtual ~Window() { delete _window; }
-        virtual void applyWindow(float* input);
+        virtual void applyWindow(double* input){
+            for (int i=0; i<length; ++i)
+                input[i]*=_window[i];
+        }
 
     protected:
         int length;
-        float* _window;
+        double* _window;
 };
 
 #endif

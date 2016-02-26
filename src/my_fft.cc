@@ -1,13 +1,13 @@
 #include "my_fft.h"
 
-void MyFFT::fft_float(bool InverseTransform, float *RealIn, float *ImagIn, float *RealOut, float *ImagOut)
+void MyFFT::fft_double(bool InverseTransform, double *RealIn, double *ImagIn, double *RealOut, double *ImagOut)
 {
 	unsigned NumBits;    /* Number of bits needed to store indices */
 	unsigned i, j, k, n;
 	unsigned BlockSize, BlockEnd;
 
-	float angle_numerator = 2.0 * DDC_PI;
-	float tr, ti;     /* temp real, temp imaginary */
+	double angle_numerator = 2.0 * DDC_PI;
+	double tr, ti;     /* temp real, temp imaginary */
 
 	if(InverseTransform)
 		angle_numerator = -angle_numerator;
@@ -26,13 +26,13 @@ void MyFFT::fft_float(bool InverseTransform, float *RealIn, float *ImagIn, float
 	BlockEnd = 1;
 	for ( BlockSize = 2; BlockSize <= NumSamples; BlockSize <<= 1 )
 	{
-		float delta_angle = angle_numerator / (float)BlockSize;
-		float sm2 = sin ( -2 * delta_angle );
-		float sm1 = sin ( -delta_angle );
-		float cm2 = cos ( -2 * delta_angle );
-		float cm1 = cos ( -delta_angle );
-		float w = 2 * cm1;
-		float ar[3], ai[3];
+		double delta_angle = angle_numerator / (double)BlockSize;
+		double sm2 = sin ( -2 * delta_angle );
+		double sm1 = sin ( -delta_angle );
+		double cm2 = cos ( -2 * delta_angle );
+		double cm1 = cos ( -delta_angle );
+		double w = 2 * cm1;
+		double ar[3], ai[3];
 
 		for ( i=0; i < NumSamples; i += BlockSize )
 		{
@@ -66,7 +66,7 @@ void MyFFT::fft_float(bool InverseTransform, float *RealIn, float *ImagIn, float
 		BlockEnd = BlockSize;
 	}
 	if(InverseTransform) {
-		float denom = (float)NumSamples;
+		double denom = (double)NumSamples;
 		for(i=0;i<NumSamples;++i)
         {
 			RealOut[i] /= denom;

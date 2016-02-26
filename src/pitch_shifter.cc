@@ -1,6 +1,6 @@
 #include "pitch_shifter.h"
 
-void PitchShifter::UpdatePhase(vector<float>& mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph, float factor) {
+void PitchShifter::UpdatePhase(vector<double>& mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph, double factor) {
     for(int i=0;i<FFT_SIZE/2+1;i++) {
         synth_freq_bin[i] = floor(i*factor);
         bin_shift_residual[i] = i*factor-synth_freq_bin[i];
@@ -8,9 +8,9 @@ void PitchShifter::UpdatePhase(vector<float>& mag, vector<float> prev_phase, vec
     }
 }
 
-void PitchShifter::SynthesizeFrame(vector<float>& mag, vector<float>& ph, Frame *f) {
+void PitchShifter::SynthesizeFrame(vector<double>& mag, vector<double>& ph, Frame *f) {
     vector<Complex> synth_spec(FFT_SIZE/2+1, Complex(0.0, 0.0));
-    float energy=0, new_energy=0; // for energy preservation
+    double energy=0, new_energy=0; // for energy preservation
 
     // interpolate complex spectrum along frequency axis
     for(int i=0;i<FFT_SIZE/2+1;i++) {
@@ -28,7 +28,7 @@ void PitchShifter::SynthesizeFrame(vector<float>& mag, vector<float>& ph, Frame 
     // energy preservation
     for (int i=0; i<FFT_SIZE/2+1; i++)
         new_energy += synth_spec[i].getEnergy();
-    float amplitude_norm = sqrt(energy/new_energy);
+    double amplitude_norm = sqrt(energy/new_energy);
     for (int i=0; i<FFT_SIZE/2+1; i++) {
         synth_spec[i].real *= amplitude_norm;
         synth_spec[i].imag *= amplitude_norm;
@@ -38,9 +38,9 @@ void PitchShifter::SynthesizeFrame(vector<float>& mag, vector<float>& ph, Frame 
     f->setSpectrum(&synth_spec[0]);
 }
 
-void PitchShifter::Shift(float factor, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase) {
+void PitchShifter::Shift(double factor, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase) {
     vector<int> subband;
-    vector<float> mag, ph;
+    vector<double> mag, ph;
     Frame *f;
 
     for (int sample_idx=0; sample_idx<input_spec.size(); ++sample_idx) {

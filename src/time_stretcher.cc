@@ -1,26 +1,26 @@
 #include "time_stretcher.h"
 
-void TimeStretcher::UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph) {
+void TimeStretcher::UpdatePhase(vector<double> mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph) {
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
         synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+next_phase[freq_bin]-prev_phase[freq_bin], 2.0*PI);
 }
 
-void TimeStretcher::SynthesizeFrame(vector<float>& mag, vector<float>& ph, Frame* f){
+void TimeStretcher::SynthesizeFrame(vector<double>& mag, vector<double>& ph, Frame* f){
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
         f->setSpectrum(freq_bin, Complex(mag[freq_bin]*cos(ph[freq_bin]), mag[freq_bin]*sin(ph[freq_bin])));
     for(int freq_bin=FFT_SIZE/2+1; freq_bin<FFT_SIZE; ++freq_bin)
         f->setSpectrum(freq_bin, f->getSpectrum(FFT_SIZE-freq_bin).getConjugate());
 }
 
-void TimeStretcher::Stretch(float rate, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase) {
-    vector<float> mag, ph;
+void TimeStretcher::Stretch(double rate, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase) {
+    vector<double> mag, ph;
     Frame *f;
-    float sample_ptr = 0.0; // the pointer to the old spectrum, where the new magnitude/phase should be synthesized from.
+    double sample_ptr = 0.0; // the pointer to the old spectrum, where the new magnitude/phase should be synthesized from.
     while ((int)sample_ptr+1<input_spec.size()) {
         int prev_frame_idx = (int)sample_ptr;
-        float prev_frame_weight = 1-(sample_ptr-(int)sample_ptr);
+        double prev_frame_weight = 1-(sample_ptr-(int)sample_ptr);
         int next_frame_idx = prev_frame_idx+1;
-        float next_frame_weight = 1-prev_frame_weight;
+        double next_frame_weight = 1-prev_frame_weight;
 
         mag = vocoder_func->vectorWeightedSum(input_spec[prev_frame_idx]->getMagnitude(), input_spec[next_frame_idx]->getMagnitude(), prev_frame_weight, next_frame_weight);
 

@@ -8,11 +8,11 @@ using namespace std;
 class VocoderFunctions {
     public:
         VocoderFunctions(int n, int s) : FFT_SIZE(n), FRAME_SHIFT(s) {}
-        float ABS2(float a,float b);
-        float phaseUnwrapping(float delta_phase, int freq_bin);
-        vector<float> vectorWeightedSum(vector<float> v1, vector<float> v2, float w1, float w2);
-        vector<int> groupChannel(vector<float>& spec);
-        //void new_ChannelGrouping(float *Spec, int *ChannelGroupFlag, float pitch);
+        double ABS2(double a,double b);
+        double phaseUnwrapping(double delta_phase, int freq_bin);
+        vector<double> vectorWeightedSum(const vector<double> &, const vector<double> &, double, double);
+        vector<int> getLocalPeaks(vector<double> &spec);
+        //void new_ChannelGrouping(double *Spec, int *ChannelGroupFlag, double pitch);
 
     private:
         int FFT_SIZE;

@@ -11,7 +11,7 @@ class Frame
 {
     public:
         Frame(int l) : length(l) {
-            frame = new float[length];
+            frame = new double[length];
             spectrum = new Complex[length];
         }
 
@@ -26,8 +26,8 @@ class Frame
         void runFFT(MyFFT* fft);
         void runIFFT(MyFFT* fft);
 
-        vector<float> getMagnitude();
-        vector<float> getPhase();
+        vector<double> getMagnitude();
+        vector<double> getPhase();
         Complex getSpectrum(int freq) {return spectrum[freq];}
         void setSpectrum(Complex* _spectrum) {
             for (int freq=0; freq<length/2+1; ++freq)
@@ -37,11 +37,11 @@ class Frame
         }
         void setSpectrum(int freq, Complex spec) {spectrum[freq] = spec;}
 
-        float* getFrame() {return frame;}
+        double* getFrame() {return frame;}
 
     private:
         int length;
-        float* frame;
+        double* frame;
         Complex* spectrum;
 };
 

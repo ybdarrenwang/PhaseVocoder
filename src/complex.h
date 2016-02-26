@@ -7,13 +7,13 @@ class Complex
 {
     public:
         Complex() : real(0.0), imag(0.0) {}
-        Complex(float r, float i) : real(r), imag(i) {}
-        float getEnergy(){return real*real+imag*imag;}
-        float getMagnitude(){return sqrt(getEnergy());}
-        float getPhase(){return atan2(imag, real);}
+        Complex(double r, double i) : real(r), imag(i) {}
+        double getEnergy(){return real*real+imag*imag;}
+        double getMagnitude(){return sqrt(getEnergy());}
+        double getPhase(){return atan2(imag, real);}
         Complex getConjugate(){return Complex(real, -1*imag);}
-        float real;
-        float imag;
+        double real;
+        double imag;
 };
 
 #endif

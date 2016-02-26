@@ -1,18 +1,18 @@
 #include "vocoder_functions.h"
 
-float VocoderFunctions::ABS2(float a,float b) {return sqrt(a*a+b*b);}
+double VocoderFunctions::ABS2(double a,double b) {return sqrt(a*a+b*b);}
 
-float VocoderFunctions::phaseUnwrapping(float delta_phase, int freq_bin) {
+double VocoderFunctions::phaseUnwrapping(double delta_phase, int freq_bin) {
     delta_phase -= 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
     while(delta_phase >= PI) delta_phase -= 2.0 * PI;
     while(delta_phase < -1.0*PI) delta_phase += 2.0 * PI;
     return delta_phase + 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
 }
 
-vector<float> VocoderFunctions::vectorWeightedSum(vector<float> v1, vector<float> v2, float w1, float w2) {
+vector<double> VocoderFunctions::vectorWeightedSum(const vector<double> &v1, const vector<double> &v2, double w1, double w2) {
     if (w2==0) return v1;
     if (w1==0) return v2;
-    vector<float> ans;
+    vector<double> ans;
     if (v1.size()!=v2.size()) return ans;
     for (int i=0; i<v1.size(); ++i)
         ans.push_back(v1[i]*w1+v2[i]*w2);
@@ -20,7 +20,7 @@ vector<float> VocoderFunctions::vectorWeightedSum(vector<float> v1, vector<float
 }
 
 /**
- * Input:  a float vector
+ * Input:  a double vector
  *         e.g. [0,1,2,1,0,3,6,5,0]
  * Output: an int vector indication the corresponding peak index of each bin;
  *         e.g. [2,2,2,2,7,7,7,7,7]
@@ -28,7 +28,7 @@ vector<float> VocoderFunctions::vectorWeightedSum(vector<float> v1, vector<float
  * - peak: larger then preceding 2 and following 2 elements
  * - valley: the minimum between 2 peaks
  */
-vector<int> VocoderFunctions::groupChannel(vector<float>& spec) {
+vector<int> VocoderFunctions::getLocalPeaks(vector<double>& spec) {
     vector<int> peak_idx;
     int peak_ptr = 0;
     int valley_ptr = 0;
@@ -52,13 +52,13 @@ vector<int> VocoderFunctions::groupChannel(vector<float>& spec) {
     return peak_idx;
 }
 /*
-void VocoderFunctions::new_ChannelGrouping(float *Spec, int *ChannelGroupFlag, float pitch) {
+void VocoderFunctions::new_ChannelGrouping(double *Spec, int *ChannelGroupFlag, double pitch) {
     int i,j;
     int GroupBoundary, PrevGroupBoundary=0, PrevPeak=0;
-    float MinTemp;
+    double MinTemp;
 
     // determine how much bins to look forward/backward
-    float bin_period = FFT_SIZE/(SamplingRate/pitch); // f0 interval width counted by bin number
+    double bin_period = FFT_SIZE/(SamplingRate/pitch); // f0 interval width counted by bin number
     int find_max_range = (int)floor(bin_period*0.5);
     bool find_max;
 

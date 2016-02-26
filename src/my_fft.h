@@ -8,7 +8,7 @@ class MyFFT
     public:
         MyFFT(unsigned n) : NumSamples(n) {}
         virtual ~MyFFT(){}
-        void fft_float(bool InverseTransform, float *RealIn, float *ImagIn, float *RealOut, float *ImagOut);
+        void fft_double(bool InverseTransform, double *RealIn, double *ImagIn, double *RealOut, double *ImagOut);
 
     private:
         unsigned NumSamples;

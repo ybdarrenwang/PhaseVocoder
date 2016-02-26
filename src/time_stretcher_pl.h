@@ -18,14 +18,14 @@ class TimeStretcherPL : public TimeStretcher
     public:
         TimeStretcherPL(int n, int s) : TimeStretcher(n, s) {
             for (int i=0; i<FFT_SIZE/2+1; ++i)
-                prev_subband.push_back(i);
+                prev_local_peaks.push_back(i);
         }
         virtual ~TimeStretcherPL() {}
 
-        void UpdatePhase(vector<float> mag, vector<float> prev_phase, vector<float> next_phase, vector<float>& synth_ph);
+        void UpdatePhase(vector<double> mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph);
 
     protected:
-        vector<int> prev_subband; // the sub-band information from previous frame
+        vector<int> prev_local_peaks; // the sub-band information from previous frame
 };
 
 #endif

@@ -21,7 +21,7 @@ void usage( const char *prog ) {
     exit(1);
 }
 
-void readConfig(vector<string> &Args, float &ts_rate, float &ps_rate, string &input_file, string &output_file) {
+void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &input_file, string &output_file) {
     for(int i=0; i<Args.size(); ++i) {
         if( Args[i] == "-t" && Args.size() > i ) {
             ++i;
@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
     // Read arguments
     string input_file = "";
     string output_file = "";
-    float ts_rate = 1;
-    float ps_rate = 1;
+    double ts_rate = 1;
+    double ps_rate = 1;
 
     vector<string> Args;
     for(int i=1; i<argc; ++i)
@@ -111,17 +111,17 @@ int main(int argc, char **argv) {
     // Synthesis
     cout<<"Synthesis"<<endl;
 
-    vector<float> square_window(FRAME_LENGTH, 1.0); // for the denominator in synthesis
+    vector<double> square_window(FRAME_LENGTH, 1.0); // for the denominator in synthesis
     window->applyWindow(&square_window[0]);
     window->applyWindow(&square_window[0]);
 
     int synth_size = wav->myDataSize/2*ts_rate;
     vector<short> synth_signal(synth_size, 0);
-    vector<float> synth_normalize_coeff(synth_size, 0.0);
+    vector<double> synth_normalize_coeff(synth_size, 0.0);
     for (int frame_idx=0; frame_idx<synth_recording.size(); ++frame_idx) {
         synth_recording[frame_idx]->runIFFT(fft);
         synth_recording[frame_idx]->applyWindow(window);
-        float *frame = synth_recording[frame_idx]->getFrame();
+        double *frame = synth_recording[frame_idx]->getFrame();
         for (int sample_idx=0; sample_idx<FRAME_LENGTH && frame_idx*FRAME_SHIFT+sample_idx<synth_size; ++sample_idx) {
             synth_signal[frame_idx*FRAME_SHIFT+sample_idx]+=frame[sample_idx];
             synth_normalize_coeff[frame_idx*FRAME_SHIFT+sample_idx]+=square_window[sample_idx];
