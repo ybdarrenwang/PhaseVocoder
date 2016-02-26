@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
         cerr<<"ERROR: input or output file not specified"<<endl;
         exit(1);
     }
-    cout<<input_file<<" -> "<<output_file<<endl;
+    cout<<endl<<"[ "<<input_file<<" -> "<<output_file<<" ]"<<endl;
 
     // Initialize parameters and functions
     cout<<"Initialize parameters and functions"<<endl;
@@ -86,16 +86,16 @@ int main(int argc, char **argv) {
 
     // Read wave file
     cout<<"Read wave file"<<endl;
-    WavFileIO* wav = new WavFileIO(input_file.c_str());
-    int sampling_rate = wav->mySampleRate;
+    WavFileIO* input_wav = new WavFileIO(input_file);
+    int sampling_rate = input_wav->mySampleRate;
 
     // Framing
     cout<<"Framing"<<endl;
     vector<Frame*> recording;
-    int num_frame = (wav->myDataSize/2-FRAME_LENGTH)/FRAME_SHIFT+1;
+    int num_frame = (input_wav->myDataSize/2-FRAME_LENGTH)/FRAME_SHIFT+1;
     for (int frame_idx=0; frame_idx<num_frame; ++frame_idx) {
         Frame *f = new Frame(FRAME_LENGTH);
-        f->loadSample(wav->myData_short, frame_idx*FRAME_SHIFT);
+        f->loadSample(input_wav->myData_short, frame_idx*FRAME_SHIFT);
         f->applyWindow(window);
         f->runFFT(fft);
         recording.push_back(f);
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
     window->applyWindow(&square_window[0]);
     window->applyWindow(&square_window[0]);
 
-    int synth_size = wav->myDataSize/2*ts_rate;
+    int synth_size = input_wav->myDataSize/2*ts_rate;
     vector<short> synth_signal(synth_size, 0);
     vector<double> synth_normalize_coeff(synth_size, 0.0);
     for (int frame_idx=0; frame_idx<synth_recording.size(); ++frame_idx) {
@@ -139,15 +139,17 @@ int main(int argc, char **argv) {
     for (int i=0; i<synth_size; ++i)
         synth_signal[i]/=synth_normalize_coeff[i];
 
-    wav->setPath(output_file.c_str());
-    wav->myDataSize = synth_size*2;
-    wav->myData_short = &synth_signal[0];
-    wav->save();
+    // Write wav file
+    WavFileIO* output_wav = new WavFileIO(*input_wav);
+    output_wav->setPath(output_file);
+    output_wav->myDataSize = synth_size*2;
+    output_wav->myData_short = &synth_signal[0]; // note: delete output_wav cause double deletion!!!
+    output_wav->save();
 
     // Release memory
     delete window;
     delete fft;
-    //delete wav;
+    delete input_wav;
     delete ts;
     delete ps;
     for (vector<Frame*>::iterator f=recording.begin(); f!=recording.end(); ++f) delete (*f);

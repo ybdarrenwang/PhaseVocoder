@@ -56,34 +56,26 @@ using namespace std;
 *  of the read of the subchunk following this 
 *  number.
 *  44        *   Data             The actual sound data.
- */
+*/
 class WavFileIO
 {
     public:
-        // empty constructor
-        WavFileIO()
-        {
-            myPath = new char[200];
-        }
+        WavFileIO(){}
 
-        // constructor takes a wav path
-        WavFileIO(const char* tmpPath)
+        WavFileIO(string &tmpPath)
         {
-            myPath = new char[200];
-            setPath(tmpPath);
+            myPath = tmpPath;
             read();
         }
 
         ~WavFileIO()
         {
-            //if (myPath != NULL) delete [] myPath;
-            //if (myData != NULL) delete [] myData;
-            //if (myData_short != NULL) delete [] myData_short;
+            if (myData != NULL) delete [] myData;
+            if (myData_short != NULL) delete [] myData_short;
         }
 
-        // get/set for the Path property
-        char* getPath() {return myPath;}
-        void setPath(const char* newPath) {strcpy(myPath, newPath);}
+        string getPath() {return myPath;}
+        void setPath(string &newPath) {myPath = newPath;}
 
         // read a wav file into this class
         bool read();
@@ -92,19 +84,19 @@ class WavFileIO
         bool save();
 
         // return a printable summary of the wav file
-        char *getSummary();
+        string getSummary();
 
         // I made this public so that you can toss whatever you want in here
         // maybe a recorded buffer, maybe just whatever you want
         char* myData;
         short* myData_short;
         int myDataSize; // because the read() function has been "reinterpreted"
-        // from "char" into "short", the original size is for "char"!!!
-        // i.e. must be divided by 2!!!
+                        // from "char" into "short", the original size is for "char"!!!
+                        // i.e. must be divided by 2!!!
         int mySampleRate;
 
     private:
-        char* 	myPath;
+        string	myPath;
         int 	myChunkSize;
         int	    mySubChunk1Size;
         short 	myFormat;

@@ -5,7 +5,7 @@ using namespace std;
 // read a wav file into this class
 bool WavFileIO::read()
 {
-	ifstream inFile( myPath, ios::in | ios::binary);
+	ifstream inFile( myPath.c_str(), ios::in | ios::binary);
 
 	//printf("Reading wav file...\n"); // for debugging only
 
@@ -51,7 +51,7 @@ bool WavFileIO::read()
 // write out the wav file
 bool WavFileIO::save()
 {
-	fstream myFile (myPath, ios::out | ios::binary);
+	fstream myFile (myPath.c_str(), ios::out | ios::binary);
 
 	// write the wav file per the wav file format
 	myFile.seekp (0, ios::beg); 
@@ -74,9 +74,15 @@ bool WavFileIO::save()
 }
 
 // return a printable summary of the wav file
-char* WavFileIO::getSummary()
+string WavFileIO::getSummary()
 {
-	char *summary = new char[250];
-	sprintf(summary, " Format: %d\n Channels: %d\n SampleRate: %d\n ByteRate: %d\n BlockAlign: %d\n BitsPerSample: %d\n DataSize: %d\n", myFormat, myChannels, mySampleRate, myByteRate, myBlockAlign, myBitsPerSample, myDataSize);
-	return summary;
+	stringstream ss;
+	ss<<" Format: "<<myFormat
+      <<"\n Channels: "<<myChannels
+      <<"\n SampleRate: "<<mySampleRate
+      <<"\n ByteRate: "<<myByteRate
+      <<"\n BlockAlign: "<<myBlockAlign
+      <<"\n BitsPerSample: "<<myBitsPerSample
+      <<"\n DataSize: "<<myDataSize<<"\n";
+	return ss.str();
 }
