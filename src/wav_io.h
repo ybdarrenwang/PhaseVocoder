@@ -63,7 +63,7 @@ class WavFileIO
     private:
         char* 	myPath;
         int 	myChunkSize;
-        int	mySubChunk1Size;
+        int	    mySubChunk1Size;
         short 	myFormat;
         short 	myChannels;
         int   	myByteRate;
@@ -93,18 +93,9 @@ class WavFileIO
 
         ~WavFileIO()
         {
-            delete myPath;
-            //			delete myData;
-            delete myData_short;
-            myChunkSize = 0;
-            mySubChunk1Size = 0;
-            myFormat = 0;
-            myChannels = 0;
-            mySampleRate = 0;
-            myByteRate = 0;
-            myBlockAlign = 0;
-            myBitsPerSample = 0;
-            myDataSize = 0;
+            //if (myPath != NULL) delete [] myPath;
+            //if (myData != NULL) delete [] myData;
+            //if (myData_short != NULL) delete [] myData_short;
         }
 
         // empty constructor

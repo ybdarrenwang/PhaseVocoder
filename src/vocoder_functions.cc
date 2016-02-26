@@ -2,10 +2,9 @@
 
 double VocoderFunctions::ABS2(double a,double b) {return sqrt(a*a+b*b);}
 
-double VocoderFunctions::phaseUnwrapping(double delta_phase, int freq_bin) {
+double VocoderFunctions::unwrapPhase(double delta_phase, int freq_bin) {
     delta_phase -= 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
-    while(delta_phase >= PI) delta_phase -= 2.0 * PI;
-    while(delta_phase < -1.0*PI) delta_phase += 2.0 * PI;
+    delta_phase = fmod(delta_phase, 2.0*PI);
     return delta_phase + 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
 }
 

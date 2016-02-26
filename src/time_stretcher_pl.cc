@@ -5,14 +5,13 @@ void TimeStretcherPL::UpdatePhase(vector<double> mag, vector<double> prev_phase,
 
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
         if (freq_bin==local_peaks[freq_bin]) {
-            //double delta_phase = next_phase[freq_bin]-prev_phase[prev_local_peaks[freq_bin]];
-            double delta_phase = next_phase[freq_bin]-prev_phase[freq_bin];
-            synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+vocoder_func->phaseUnwrapping(delta_phase, freq_bin), 2.0*PI);
+            double delta_phase = next_phase[freq_bin]-prev_phase[prev_local_peaks[freq_bin]];
+            synth_ph[freq_bin] = fmod(synth_ph[freq_bin]+vocoder_func->unwrapPhase(delta_phase, freq_bin), 2.0*PI);
     }
 
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)
         if (freq_bin!=local_peaks[freq_bin])
-            synth_ph[freq_bin] = fmod(synth_ph[local_peaks[freq_bin]]+next_phase[freq_bin]-next_phase[local_peaks[freq_bin]], 2.0*PI);
+            synth_ph[freq_bin] = fmod(synth_ph[local_peaks[freq_bin]]+ts_factor*(next_phase[freq_bin]-next_phase[local_peaks[freq_bin]]), 2.0*PI);
 
     prev_local_peaks = local_peaks;
 }

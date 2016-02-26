@@ -13,6 +13,7 @@ void TimeStretcher::SynthesizeFrame(vector<double>& mag, vector<double>& ph, Fra
 }
 
 void TimeStretcher::Stretch(double rate, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase) {
+    ts_factor = rate;
     vector<double> mag, ph;
     Frame *f;
     double sample_ptr = 0.0; // the pointer to the old spectrum, where the new magnitude/phase should be synthesized from.

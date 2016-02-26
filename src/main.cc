@@ -17,11 +17,12 @@ void usage( const char *prog ) {
         << " -t TIME_SCALE_FACTOR  (>1 for slowdown, <1 for speedup) [default:1]"<<endl
         << " -p PITCH_SCALE_FACTOR (>1 for higher, <1 for lower)     [default:1]"<<endl
         << " -i INPUT_WAVE_FILE_PATH"<<endl
-        << " -o SYNTHESIZED_WAVE_FILE_PATH"<<endl<<endl;
+        << " -o SYNTHESIZED_WAVE_FILE_PATH"<<endl<<endl
+        << " --phaselock           (enable phase-locking)            [default:off]"<<endl<<endl;
     exit(1);
 }
 
-void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &input_file, string &output_file) {
+void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &input_file, string &output_file, bool &phase_lock) {
     for(int i=0; i<Args.size(); ++i) {
         if( Args[i] == "-t" && Args.size() > i ) {
             ++i;
@@ -42,6 +43,9 @@ void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &
             ++i;
             output_file = Args[i];
         }
+        else if( Args[i] == "--phaselock" && Args.size() > i ) {
+            phase_lock = true;
+        }
     }
 }
 
@@ -56,6 +60,7 @@ int main(int argc, char **argv) {
     string output_file = "";
     double ts_rate = 1;
     double ps_rate = 1;
+    bool phase_lock = false;
 
     vector<string> Args;
     for(int i=1; i<argc; ++i)
@@ -63,7 +68,7 @@ int main(int argc, char **argv) {
         string tmpstr(argv[i]);
         Args.push_back( tmpstr );
     }
-    readConfig(Args, ts_rate, ps_rate, input_file, output_file);
+    readConfig(Args, ts_rate, ps_rate, input_file, output_file, phase_lock);
     if (input_file=="" || output_file=="") {
         cerr<<"ERROR: input or output file not specified"<<endl;
         exit(1);
@@ -98,7 +103,11 @@ int main(int argc, char **argv) {
 
     // Time stretching
     cout<<"Time stretching"<<endl;
-    TimeStretcher *ts = new TimeStretcher(FFT_SIZE, FRAME_SHIFT);
+    TimeStretcher *ts;
+    if (phase_lock)
+        ts = new TimeStretcherPL(FFT_SIZE, FRAME_SHIFT);
+    else
+        ts = new TimeStretcher(FFT_SIZE, FRAME_SHIFT);
     vector<Frame*> tmp_recording;
     ts->Stretch(ts_rate, recording, tmp_recording, true);
 
@@ -135,6 +144,15 @@ int main(int argc, char **argv) {
     wav->myData_short = &synth_signal[0];
     wav->save();
 
+    // Release memory
+    delete window;
+    delete fft;
+    //delete wav;
+    delete ts;
+    delete ps;
+    for (vector<Frame*>::iterator f=recording.begin(); f!=recording.end(); ++f) delete (*f);
+    for (vector<Frame*>::iterator f=tmp_recording.begin(); f!=tmp_recording.end(); ++f) delete (*f);
+    for (vector<Frame*>::iterator f=synth_recording.begin(); f!=synth_recording.end(); ++f) delete (*f);
     cout<<"Complete!"<<endl;
     return 0;
 }

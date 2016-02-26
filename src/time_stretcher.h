@@ -24,6 +24,7 @@ class TimeStretcher
         int FRAME_SHIFT;
         vector<double> cached_phase; // the last phase spectrum from previous Stretch execution
         VocoderFunctions* vocoder_func;
+        double ts_factor;
 };
 
 #endif

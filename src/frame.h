@@ -16,7 +16,6 @@ class Frame
         }
 
         virtual ~Frame() {
-            cout<<"delete frame"<<endl;
             if (frame) delete frame;
             if (spectrum) delete spectrum;
         }

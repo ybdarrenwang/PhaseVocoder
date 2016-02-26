@@ -4,7 +4,7 @@ void PitchShifter::UpdatePhase(vector<double>& mag, vector<double> prev_phase, v
     for(int i=0;i<FFT_SIZE/2+1;i++) {
         synth_freq_bin[i] = floor(i*factor);
         bin_shift_residual[i] = i*factor-synth_freq_bin[i];
-        synth_ph[i] = fmod(synth_ph[i]+factor*vocoder_func->phaseUnwrapping(next_phase[i]-prev_phase[i], i), 2.0*PI);
+        synth_ph[i] = fmod(synth_ph[i]+factor*vocoder_func->unwrapPhase(next_phase[i]-prev_phase[i], i), 2.0*PI);
     }
 }
 
