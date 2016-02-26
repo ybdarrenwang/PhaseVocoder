@@ -18,3 +18,7 @@ Execute "make" to create PhaseVocoder.exe.
 Test
 ----
 After PhaseVocoder.exe is complied, go to test/ directory and execute "sh test.sh".
+
+Reference
+---------
+Laroche, Jean, and Mark Dolson. "Improved phase vocoder time-scale modification of audio." Speech and Audio Processing, IEEE Transactions on 7.3 (1999): 323-332.
