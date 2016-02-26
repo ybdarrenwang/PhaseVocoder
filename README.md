@@ -33,5 +33,5 @@ After PhaseVocoder.exe is complied, go to test/ directory and execute "sh test.s
 
 Reference
 ---------
-[1] Moulines, Eric, and Jean Laroche. "Non-parametric techniques for pitch-scale and time-scale modification of speech." Speech communication 16.2 (1995): 175-205.
-[2] Laroche, Jean, and Mark Dolson. "Improved phase vocoder time-scale modification of audio." Speech and Audio Processing, IEEE Transactions on 7.3 (1999): 323-332.
+- Moulines, Eric, and Jean Laroche. "Non-parametric techniques for pitch-scale and time-scale modification of speech." Speech communication 16.2 (1995): 175-205.
+- Laroche, Jean, and Mark Dolson. "Improved phase vocoder time-scale modification of audio." Speech and Audio Processing, IEEE Transactions on 7.3 (1999): 323-332.
