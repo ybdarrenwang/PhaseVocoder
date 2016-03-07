@@ -1,28 +1,33 @@
-GPP = g++
-GPPFlag = -O2 -Wall
+GPP=g++
+GPPFLAGS=-O3 -Wall
 
-SRC = src
-BUILD = build
+SRC=src
+BUILD=build
 
-CDIR = cd
-MKDIR = mkdir -p
-RM = rm -rf
+SOURCES=main.cc \
+    vocoder_functions.cc \
+    time_stretcher.cc \
+    my_fft.cc \
+    frame.cc \
+    wav_io.cc \
+    time_stretcher_pl.cc \
+    pitch_shifter.cc \
+    phasevocoder.cc
 
-objects = $(BUILD)/main.o $(BUILD)/vocoder_functions.o $(BUILD)/time_stretcher.o $(BUILD)/my_fft.o $(BUILD)/frame.o $(BUILD)/wav_io.o $(BUILD)/time_stretcher_pl.o $(BUILD)/pitch_shifter.o $(BUILD)/phasevocoder.o
+OBJ:=$(addprefix $(BUILD)/, $(addsuffix .o,$(basename $(SOURCES))))
 
-.PHONY : dir
+.PHONY: dir clean
 
 all: dir program
 
 dir:
-	$(MKDIR) $(BUILD)
+	mkdir -p $(BUILD)
 
-program: $(objects)
-	$(GPP) $(GPPFlag) -o PhaseVocoder.exe $^
+program: $(OBJ)
+	$(GPP) $(GPPFLAGS) -o PhaseVocoder.exe $^
 
 $(BUILD)/%.o: $(SRC)/%.cc
 	$(GPP) -c -o $@ $<
 
-.PHONY : clean
 clean:
-	$(RM) $(BUILD)
+	rm -rf $(BUILD)
