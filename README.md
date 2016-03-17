@@ -25,11 +25,11 @@ g++ 4.2 or higher
 
 Installation
 ------------
-Execute "make" to create PhaseVocoder.exe.
+`make` to create PhaseVocoder.exe.
 
 Test
 ----
-After PhaseVocoder.exe is complied, go to test/ directory and execute "sh test.sh".
+After PhaseVocoder.exe is complied, go to test/ directory and run `sh test.sh`.
 
 Reference
 ---------
