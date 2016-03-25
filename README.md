@@ -4,10 +4,10 @@ Phase Vocoder
 This is a phase vocoder written in C++. The main purpose of a phase vocoder is to change the speed and pitch of a given voice recording file.
 
 Current version supports the following time stretching algorithms
-1. Default: number of frames remain the same, while the output synthesis-rate/frame-shift/hop-size is modified correspondingly.
-2. --phaseLock: perform phase locking as described in [Laroche1999]
-3. --specInterpolate: perform interpolate/extrapolate on spectrogram, thus the number of frames changed; while the output synthesis-rate/frame-shift/hop-size remain the same as analysis.
-4. Both --phaseLocking and --specInterpolate
+- Default: number of frames remain the same, while the output synthesis-rate/frame-shift/hop-size is modified correspondingly.
+- --phaseLock: perform phase locking as described in [Laroche1999]
+- --specInterpolate: perform interpolate/extrapolate on spectrogram, thus the number of frames changed; while the output synthesis-rate/frame-shift/hop-size remain the same as analysis.
+- Both --phaseLocking and --specInterpolate
 
 Heuristically, use --phaseLock for human speech and --specInterpolate for music yield the best result.
 
