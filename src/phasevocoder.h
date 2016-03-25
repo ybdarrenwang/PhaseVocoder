@@ -2,6 +2,7 @@
 #define PHASEVOCODER_H
 
 #include "time_stretcher.h"
+#include "time_stretcher_fd.h"
 #include "time_stretcher_pl.h"
 #include "pitch_shifter.h"
 #include "complex.h"

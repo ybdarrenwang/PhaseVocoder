@@ -1,5 +1,5 @@
-#ifndef __TIMESTRETCHER_H__
-#define __TIMESTRETCHER_H__
+#ifndef TIMESTRETCHER_H
+#define TIMESTRETCHER_H
 
 #include "vocoder_functions.h"
 #include "frame.h"
@@ -16,8 +16,8 @@ class TimeStretcher
         virtual ~TimeStretcher() { delete vocoder_func; }
 
         virtual void UpdatePhase(vector<double> mag, vector<double> prev_phase, vector<double> phase, vector<double>& synth_ph);
-        void SynthesizeFrame(vector<double>&, vector<double>&, Frame*);
-        void Stretch(double rate, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase);
+        virtual void SynthesizeFrame(vector<double>&, vector<double>&, Frame*);
+        virtual void Stretch(double rate, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase);
 
     protected:
         int FFT_SIZE;

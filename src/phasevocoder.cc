@@ -17,7 +17,7 @@ PhaseVocoder::PhaseVocoder(int frame_length, int frame_shift, bool pl)
     if (phase_lock)
         ts = new TimeStretcherPL(FFT_SIZE, analysis_frame_shift);
     else
-        ts = new TimeStretcher(FFT_SIZE, analysis_frame_shift);
+        ts = new TimeStretcherFD(FFT_SIZE, analysis_frame_shift);
     ps = new PitchShifter(FFT_SIZE, analysis_frame_shift);
 }
     
