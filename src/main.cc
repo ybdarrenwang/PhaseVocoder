@@ -13,7 +13,7 @@ void usage( const char *prog ) {
         << " -p PITCH_SCALE_FACTOR (>1 for higher, <1 for lower)     [default:1]"<<endl
         << " -i INPUT_WAVE_FILE_PATH"<<endl
         << " -o SYNTHESIZED_WAVE_FILE_PATH"<<endl<<endl
-        << " --phaselock           (enable phase-locking)            [default:off]"<<endl
+        << " --phaseLock           (enable phase-locking)            [default:off]"<<endl
         << " --specInterpolate     (enable time-stretching by"<<endl
         << "                        frequency domain interpolation)  [default:off]"<<endl<<endl;
     exit(1);
@@ -41,7 +41,7 @@ void readConfig(vector<string> &Args, double &ts_factor, double &ps_factor, stri
             ++i;
             output_file = Args[i];
         }
-        else if( Args[i] == "--phaselock" && Args.size() > i ) {
+        else if( Args[i] == "--phaseLock" && Args.size() > i ) {
             phase_lock = true;
         }
         else if( Args[i] == "--specInterpolate" && Args.size() > i ) {

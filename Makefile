@@ -3,6 +3,7 @@ CXXFLAGS=-O3 -Wall
 
 SRC=src
 OBJ=obj
+BIN=bin
 
 SOURCES=main.cc \
     vocoder_functions.cc \
@@ -26,13 +27,13 @@ debug: CXXFLAGS += -DDEBUG -g
 debug: all
 
 dir:
-	mkdir -p $(OBJ)
+	mkdir -p $(BIN) $(OBJ)
 
 program: $(OBJECTS)
-	$(CXX) $(CXXFLAGS) -o PhaseVocoder.exe $^
+	$(CXX) $(CXXFLAGS) -o $(BIN)/PhaseVocoder $^
 
 $(OBJ)/%.o: $(SRC)/%.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf $(OBJ)
+	rm -rf $(BIN) $(OBJ)
