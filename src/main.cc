@@ -13,11 +13,14 @@ void usage( const char *prog ) {
         << " -p PITCH_SCALE_FACTOR (>1 for higher, <1 for lower)     [default:1]"<<endl
         << " -i INPUT_WAVE_FILE_PATH"<<endl
         << " -o SYNTHESIZED_WAVE_FILE_PATH"<<endl<<endl
-        << " --phaselock           (enable phase-locking)            [default:off]"<<endl<<endl;
+        << " --phaselock           (enable phase-locking)            [default:off]"<<endl
+        << " --specInterpolate     (enable time-stretching by"<<endl
+        << "                        frequency domain interpolation)  [default:off]"<<endl<<endl;
     exit(1);
 }
 
-void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &input_file, string &output_file, bool &phase_lock) {
+void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &input_file, string &output_file, bool &phase_lock, bool &fd_interpolate)
+{
     for(unsigned int i=0; i<Args.size(); ++i) {
         if( Args[i] == "-t" && Args.size() > i ) {
             ++i;
@@ -41,6 +44,9 @@ void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &
         else if( Args[i] == "--phaselock" && Args.size() > i ) {
             phase_lock = true;
         }
+        else if( Args[i] == "--specInterpolate" && Args.size() > i ) {
+            fd_interpolate = true;
+        }
     }
 }
 
@@ -51,11 +57,9 @@ int main(int argc, char **argv) {
     }
 
     // Read arguments
-    string input_file = "";
-    string output_file = "";
-    double ts_rate = 1;
-    double ps_rate = 1;
-    bool phase_lock = false;
+    string input_file="", output_file="";
+    double ts_rate=1, ps_rate=1;
+    bool phase_lock=false, fd_interpolate=false;
 
     vector<string> Args;
     for(int i=1; i<argc; ++i)
@@ -63,7 +67,7 @@ int main(int argc, char **argv) {
         string tmpstr(argv[i]);
         Args.push_back( tmpstr );
     }
-    readConfig(Args, ts_rate, ps_rate, input_file, output_file, phase_lock);
+    readConfig(Args, ts_rate, ps_rate, input_file, output_file, phase_lock, fd_interpolate);
     if (input_file=="" || output_file=="") {
         cerr<<"ERROR: input or output file not specified"<<endl;
         exit(1);
@@ -71,11 +75,11 @@ int main(int argc, char **argv) {
     cout<<"[ "<<input_file<<" -> "<<output_file<<" ]"<<endl;
 
     // Execute
-    PhaseVocoder *pv = new PhaseVocoder(FRAME_LENGTH, FRAME_SHIFT, phase_lock);
+    PhaseVocoder *pv = new PhaseVocoder(FRAME_LENGTH, FRAME_SHIFT, phase_lock, fd_interpolate, ts_rate, ps_rate);
     pv->ReadWave(input_file);
     pv->Analysis();
-    pv->PitchShifting(ps_rate);
-    pv->TimeStretching(ts_rate);
+    pv->PitchShifting();
+    pv->TimeStretching();
     pv->Synthesis();
     pv->WriteWave(output_file);
     delete pv;

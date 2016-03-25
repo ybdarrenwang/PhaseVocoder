@@ -4,6 +4,7 @@
 #include "time_stretcher.h"
 #include "time_stretcher_fd.h"
 #include "time_stretcher_pl.h"
+#include "time_stretcher_fd_pl.h"
 #include "pitch_shifter.h"
 #include "complex.h"
 #include "window.h"
@@ -15,13 +16,13 @@ using namespace std;
 
 class PhaseVocoder {
     public:
-        PhaseVocoder(int frame_length, int frame_shift, bool pl);
+        PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool fd_interpolate, double _ts_rate, double _ps_rate);
         virtual ~PhaseVocoder();
 
         virtual void ReadWave(string input_file);
         virtual void Analysis();
-        virtual void TimeStretching(float ts_rate);
-        virtual void PitchShifting(float ps_rate);
+        virtual void TimeStretching();
+        virtual void PitchShifting();
         virtual void Synthesis();
         virtual void WriteWave(string output_file);
 

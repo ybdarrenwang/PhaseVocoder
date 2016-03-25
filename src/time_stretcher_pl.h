@@ -1,5 +1,5 @@
-#ifndef __TIMESTRETCHERPL_H__
-#define __TIMESTRETCHERPL_H__
+#ifndef TIMESTRETCHERPL_H
+#define TIMESTRETCHERPL_H
 
 #include "time_stretcher.h"
 
@@ -16,13 +16,12 @@ using namespace std;
 class TimeStretcherPL : public TimeStretcher
 {
     public:
-        TimeStretcherPL(int n, int s) : TimeStretcher(n, s) {
+        TimeStretcherPL(double rate, int n, int s) : TimeStretcher(rate, n, s) {
             for (int i=0; i<FFT_SIZE/2+1; ++i)
                 prev_local_peaks.push_back(i);
         }
         virtual ~TimeStretcherPL() {}
-
-        void UpdatePhase(vector<double> mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph);
+        virtual void UpdatePhase(vector<double> mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph);
 
     protected:
         vector<int> prev_local_peaks; // the sub-band information from previous frame

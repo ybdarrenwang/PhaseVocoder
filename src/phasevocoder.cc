@@ -2,23 +2,32 @@
 
 using namespace std;
 
-PhaseVocoder::PhaseVocoder(int frame_length, int frame_shift, bool pl)
+PhaseVocoder::PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool fd_interpolate, double _ts_rate, double _ps_rate)
 {
     #ifdef DEBUG
     cout<<"Initialize parameters and functions"<<endl;
     #endif
     analysis_frame_shift = synthesis_frame_shift = frame_shift;
     FFT_SIZE = frame_length;
-    phase_lock = pl;
     window = new HammingWindow(FFT_SIZE);
     fft = new MyFFT(FFT_SIZE);
-    ts_rate = 1.0;
-    ps_rate = 1.0;
+    ts_rate = _ts_rate;
+    ps_rate = _ps_rate;
     if (phase_lock)
-        ts = new TimeStretcherPL(FFT_SIZE, analysis_frame_shift);
+    {
+        if (fd_interpolate)
+            ts = new TimeStretcherFDPL(ts_rate, FFT_SIZE, analysis_frame_shift);
+        else
+            ts = new TimeStretcherPL(ts_rate, FFT_SIZE, analysis_frame_shift);
+    }
     else
-        ts = new TimeStretcherFD(FFT_SIZE, analysis_frame_shift);
-    ps = new PitchShifter(FFT_SIZE, analysis_frame_shift);
+    {
+        if (fd_interpolate)
+            ts = new TimeStretcherFD(ts_rate, FFT_SIZE, analysis_frame_shift);
+        else
+            ts = new TimeStretcher(ts_rate, FFT_SIZE, analysis_frame_shift);
+    }
+    ps = new PitchShifter(ps_rate, FFT_SIZE, analysis_frame_shift);
 }
     
 PhaseVocoder::~PhaseVocoder()
@@ -56,30 +65,27 @@ void PhaseVocoder::Analysis()
     }
 }
 
-void PhaseVocoder::TimeStretching(float rate)
+void PhaseVocoder::TimeStretching()
 {
-    ts_rate = rate;
     if (ts_rate!=1) {
         #ifdef DEBUG
         cout<<"Time stretching"<<endl;
         #endif
         vector<Frame*> new_spectrogram;
-        ts->Stretch(ts_rate, spectrogram, new_spectrogram, true);
+        ts->Stretch(spectrogram, new_spectrogram, synthesis_frame_shift, true);
         for (vector<Frame*>::iterator f=spectrogram.begin(); f!=spectrogram.end(); ++f) delete (*f);
         spectrogram = new_spectrogram;
     }
 }
 
-void PhaseVocoder::PitchShifting(float rate)
+void PhaseVocoder::PitchShifting()
 {
-    ps_rate = rate;
     if (ps_rate!=1) {
         #ifdef DEBUG
         cout<<"Pitch shifting"<<endl;
         #endif
-        PitchShifter *ps = new PitchShifter(FFT_SIZE, analysis_frame_shift);
         vector<Frame*> new_spectrogram;
-        ps->Shift(ps_rate, spectrogram, new_spectrogram, true);
+        ps->Shift(spectrogram, new_spectrogram, true);
         for (vector<Frame*>::iterator f=spectrogram.begin(); f!=spectrogram.end(); ++f) delete (*f);
         spectrogram = new_spectrogram;
     }
