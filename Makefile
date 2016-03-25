@@ -1,5 +1,5 @@
-GPP=g++
-GPPFLAGS=-O3 -Wall
+CXX=g++
+CXXFLAGS=-O3 -Wall
 
 SRC=src
 BUILD=build
@@ -20,14 +20,17 @@ OBJ:=$(addprefix $(BUILD)/, $(addsuffix .o,$(basename $(SOURCES))))
 
 all: dir program
 
+debug: CXXFLAGS += -DDEBUG -g
+debug: all
+
 dir:
 	mkdir -p $(BUILD)
 
 program: $(OBJ)
-	$(GPP) $(GPPFLAGS) -o PhaseVocoder.exe $^
+	$(CXX) $(CXXFLAGS) -o PhaseVocoder.exe $^
 
 $(BUILD)/%.o: $(SRC)/%.cc
-	$(GPP) -c -o $@ $<
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
 	rm -rf $(BUILD)

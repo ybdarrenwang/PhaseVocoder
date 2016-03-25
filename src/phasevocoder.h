@@ -17,17 +17,19 @@ class PhaseVocoder {
         PhaseVocoder(int frame_length, int frame_shift, bool pl);
         virtual ~PhaseVocoder();
 
-        void ReadWave(string input_file);
-        void Analysis();
-        void TimeStretching(float ts_rate);
-        void PitchShifting(float ps_rate);
-        void Synthesis();
-        void WriteWave(string output_file);
+        virtual void ReadWave(string input_file);
+        virtual void Analysis();
+        virtual void TimeStretching(float ts_rate);
+        virtual void PitchShifting(float ps_rate);
+        virtual void Synthesis();
+        virtual void WriteWave(string output_file);
 
-    private:
+    protected:
+        TimeStretcher *ts;
+        PitchShifter *ps;
         int analysis_frame_shift;
         int synthesis_frame_shift;
-        int FFT_SIZE;
+        unsigned int FFT_SIZE;
         bool phase_lock;
         Window *window;
         MyFFT *fft;
@@ -37,7 +39,7 @@ class PhaseVocoder {
         double ps_rate;
         vector<Frame*> spectrogram;
         short* synth_signal;
-        int synth_size;
+        unsigned int synth_size;
 };
 
 #endif

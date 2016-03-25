@@ -18,7 +18,7 @@ void usage( const char *prog ) {
 }
 
 void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &input_file, string &output_file, bool &phase_lock) {
-    for(int i=0; i<Args.size(); ++i) {
+    for(unsigned int i=0; i<Args.size(); ++i) {
         if( Args[i] == "-t" && Args.size() > i ) {
             ++i;
             stringstream ss(Args[i]);
@@ -68,18 +68,21 @@ int main(int argc, char **argv) {
         cerr<<"ERROR: input or output file not specified"<<endl;
         exit(1);
     }
-    cout<<endl<<"[ "<<input_file<<" -> "<<output_file<<" ]"<<endl;
+    cout<<"[ "<<input_file<<" -> "<<output_file<<" ]"<<endl;
 
     // Execute
     PhaseVocoder *pv = new PhaseVocoder(FRAME_LENGTH, FRAME_SHIFT, phase_lock);
     pv->ReadWave(input_file);
     pv->Analysis();
-    pv->TimeStretching(ts_rate);
     pv->PitchShifting(ps_rate);
+    pv->TimeStretching(ts_rate);
     pv->Synthesis();
     pv->WriteWave(output_file);
     delete pv;
 
-    cout<<"Complete!"<<endl;
+    #ifdef DEBUG
+    cout<<"Complete!"<<endl<<endl;
+    #endif
+
     return 0;
 }

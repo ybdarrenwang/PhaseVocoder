@@ -13,7 +13,7 @@ vector<double> VocoderFunctions::vectorWeightedSum(const vector<double> &v1, con
     if (w1==0) return v2;
     vector<double> ans;
     if (v1.size()!=v2.size()) return ans;
-    for (int i=0; i<v1.size(); ++i)
+    for (unsigned int i=0; i<v1.size(); ++i)
         ans.push_back(v1[i]*w1+v2[i]*w2);
     return ans;
 }
@@ -33,10 +33,10 @@ vector<int> VocoderFunctions::getLocalPeaks(vector<double>& spec) {
     int valley_ptr = 0;
     peak_idx.push_back(0);
     peak_idx.push_back(0);
-    for (int i=2; i<spec.size()-2; ++i) {
+    for (unsigned int i=2; i<spec.size()-2; ++i) {
         if (spec[i] > spec[i-1] && spec[i] > spec[i-2] && spec[i] > spec[i+1] && spec[i] > spec[i+2]) {
             // peak: overwrite from valley to current position
-            for (int j=valley_ptr; j<i; ++j)
+            for (unsigned int j=valley_ptr; j<i; ++j)
                 peak_idx[j] = i;
             peak_ptr = i;
             valley_ptr = i;

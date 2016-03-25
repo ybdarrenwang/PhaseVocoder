@@ -83,6 +83,6 @@ string WavFileIO::getSummary()
       <<"\n ByteRate: "<<myByteRate
       <<"\n BlockAlign: "<<myBlockAlign
       <<"\n BitsPerSample: "<<myBitsPerSample
-      <<"\n DataSize: "<<myDataSize<<"\n";
+      <<"\n DataSize: "<<myDataSize;
 	return ss.str();
 }

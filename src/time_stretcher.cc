@@ -17,7 +17,7 @@ void TimeStretcher::Stretch(double rate, vector<Frame*>& input_spec, vector<Fram
     vector<double> mag, ph;
     Frame *f;
     double sample_ptr = 0.0; // the pointer to the old spectrum, where the new magnitude/phase should be synthesized from.
-    while ((int)sample_ptr+1<input_spec.size()) {
+    while ((unsigned int)sample_ptr+1<input_spec.size()) {
         int prev_frame_idx = (int)sample_ptr;
         double prev_frame_weight = 1-(sample_ptr-(int)sample_ptr);
         int next_frame_idx = prev_frame_idx+1;

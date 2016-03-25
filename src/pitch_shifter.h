@@ -18,7 +18,7 @@ class PitchShifter
             synth_freq_bin = vector<int>(n/2+1, 0);
             vocoder_func = new VocoderFunctions(n, s);
         }
-
+        virtual ~PitchShifter() {delete vocoder_func;}
         virtual void UpdatePhase(vector<double>& mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph, double factor);
         virtual void SynthesizeFrame(vector<double>& mag, vector<double>& ph, Frame *f);
         virtual void Shift(double factor, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase);

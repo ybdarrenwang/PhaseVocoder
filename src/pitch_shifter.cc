@@ -43,7 +43,7 @@ void PitchShifter::Shift(double factor, vector<Frame*>& input_spec, vector<Frame
     vector<double> mag, ph;
     Frame *f;
 
-    for (int sample_idx=0; sample_idx<input_spec.size(); ++sample_idx) {
+    for (unsigned int sample_idx=0; sample_idx<input_spec.size(); ++sample_idx) {
         mag = input_spec[sample_idx]->getMagnitude();
         if (sample_idx)
             UpdatePhase(mag, input_spec[sample_idx-1]->getPhase(), input_spec[sample_idx]->getPhase(), ph, factor);
