@@ -13,7 +13,7 @@ using namespace std;
 class TimeStretcherFD : public TimeStretcher
 {
     public:
-        TimeStretcherFD(double rate, int n, int s) : TimeStretcher(rate, n, s) {}
+        TimeStretcherFD(double f, int n, int s) : TimeStretcher(f, n, s) {}
         virtual ~TimeStretcherFD(){}
         virtual void UpdatePhase(vector<double> mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph);
         virtual void Stretch(vector<Frame*>& input_spec, vector<Frame*>& output_spec, int &synthesis_frame_shift, bool reset_phase);

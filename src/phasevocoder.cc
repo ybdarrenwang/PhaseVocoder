@@ -2,7 +2,7 @@
 
 using namespace std;
 
-PhaseVocoder::PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool fd_interpolate, double _ts_rate, double _ps_rate)
+PhaseVocoder::PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool spec_interpolate, double _ts_factor, double _ps_factor)
 {
     #ifdef DEBUG
     cout<<"Initialize parameters and functions"<<endl;
@@ -11,23 +11,23 @@ PhaseVocoder::PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, b
     FFT_SIZE = frame_length;
     window = new HammingWindow(FFT_SIZE);
     fft = new MyFFT(FFT_SIZE);
-    ts_rate = _ts_rate;
-    ps_rate = _ps_rate;
+    ts_factor = _ts_factor;
+    ps_factor = _ps_factor;
     if (phase_lock)
     {
-        if (fd_interpolate)
-            ts = new TimeStretcherFDPL(ts_rate, FFT_SIZE, analysis_frame_shift);
+        if (spec_interpolate)
+            ts = new TimeStretcherFDPL(ts_factor, FFT_SIZE, analysis_frame_shift);
         else
-            ts = new TimeStretcherPL(ts_rate, FFT_SIZE, analysis_frame_shift);
+            ts = new TimeStretcherPL(ts_factor, FFT_SIZE, analysis_frame_shift);
     }
     else
     {
-        if (fd_interpolate)
-            ts = new TimeStretcherFD(ts_rate, FFT_SIZE, analysis_frame_shift);
+        if (spec_interpolate)
+            ts = new TimeStretcherFD(ts_factor, FFT_SIZE, analysis_frame_shift);
         else
-            ts = new TimeStretcher(ts_rate, FFT_SIZE, analysis_frame_shift);
+            ts = new TimeStretcher(ts_factor, FFT_SIZE, analysis_frame_shift);
     }
-    ps = new PitchShifter(ps_rate, FFT_SIZE, analysis_frame_shift);
+    ps = new PitchShifter(ps_factor, FFT_SIZE, analysis_frame_shift);
 }
     
 PhaseVocoder::~PhaseVocoder()
@@ -67,7 +67,7 @@ void PhaseVocoder::Analysis()
 
 void PhaseVocoder::TimeStretching()
 {
-    if (ts_rate!=1) {
+    if (ts_factor!=1) {
         #ifdef DEBUG
         cout<<"Time stretching"<<endl;
         #endif
@@ -80,7 +80,7 @@ void PhaseVocoder::TimeStretching()
 
 void PhaseVocoder::PitchShifting()
 {
-    if (ps_rate!=1) {
+    if (ps_factor!=1) {
         #ifdef DEBUG
         cout<<"Pitch shifting"<<endl;
         #endif
@@ -100,7 +100,7 @@ void PhaseVocoder::Synthesis()
     window->applyWindow(&square_window[0]);
     window->applyWindow(&square_window[0]);
 
-    synth_size = input_wav->myDataSize/2*ts_rate;
+    synth_size = input_wav->myDataSize/2*ts_factor;
     synth_signal = new short[synth_size];
     for (unsigned int i=0; i<synth_size; ++i) synth_signal[i]=0;
 

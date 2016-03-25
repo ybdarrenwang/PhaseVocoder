@@ -19,19 +19,19 @@ void usage( const char *prog ) {
     exit(1);
 }
 
-void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &input_file, string &output_file, bool &phase_lock, bool &fd_interpolate)
+void readConfig(vector<string> &Args, double &ts_factor, double &ps_factor, string &input_file, string &output_file, bool &phase_lock, bool &spec_interpolate)
 {
     for(unsigned int i=0; i<Args.size(); ++i) {
         if( Args[i] == "-t" && Args.size() > i ) {
             ++i;
             stringstream ss(Args[i]);
-            ss >> ts_rate;
+            ss >> ts_factor;
         }
         else if( Args[i] == "-p" && Args.size() > i )
         {
             ++i;
             stringstream ss(Args[i]);
-            ss >> ps_rate;
+            ss >> ps_factor;
         }
         else if( Args[i] == "-i" && Args.size() > i ) {
             ++i;
@@ -45,7 +45,7 @@ void readConfig(vector<string> &Args, double &ts_rate, double &ps_rate, string &
             phase_lock = true;
         }
         else if( Args[i] == "--specInterpolate" && Args.size() > i ) {
-            fd_interpolate = true;
+            spec_interpolate = true;
         }
     }
 }
@@ -58,8 +58,8 @@ int main(int argc, char **argv) {
 
     // Read arguments
     string input_file="", output_file="";
-    double ts_rate=1, ps_rate=1;
-    bool phase_lock=false, fd_interpolate=false;
+    double ts_factor=1, ps_factor=1;
+    bool phase_lock=false, spec_interpolate=false;
 
     vector<string> Args;
     for(int i=1; i<argc; ++i)
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
         string tmpstr(argv[i]);
         Args.push_back( tmpstr );
     }
-    readConfig(Args, ts_rate, ps_rate, input_file, output_file, phase_lock, fd_interpolate);
+    readConfig(Args, ts_factor, ps_factor, input_file, output_file, phase_lock, spec_interpolate);
     if (input_file=="" || output_file=="") {
         cerr<<"ERROR: input or output file not specified"<<endl;
         exit(1);
@@ -75,7 +75,7 @@ int main(int argc, char **argv) {
     cout<<"[ "<<input_file<<" -> "<<output_file<<" ]"<<endl;
 
     // Execute
-    PhaseVocoder *pv = new PhaseVocoder(FRAME_LENGTH, FRAME_SHIFT, phase_lock, fd_interpolate, ts_rate, ps_rate);
+    PhaseVocoder *pv = new PhaseVocoder(FRAME_LENGTH, FRAME_SHIFT, phase_lock, spec_interpolate, ts_factor, ps_factor);
     pv->ReadWave(input_file);
     pv->Analysis();
     pv->PitchShifting();

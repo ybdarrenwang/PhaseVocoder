@@ -16,7 +16,7 @@ using namespace std;
 
 class PhaseVocoder {
     public:
-        PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool fd_interpolate, double _ts_rate, double _ps_rate);
+        PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool spec_interpolate, double _ts_factor, double _ps_factor);
         virtual ~PhaseVocoder();
 
         virtual void ReadWave(string input_file);
@@ -37,8 +37,8 @@ class PhaseVocoder {
         MyFFT *fft;
         WavFileIO *input_wav, *output_wav;
         int sampling_rate;
-        double ts_rate;
-        double ps_rate;
+        double ts_factor;
+        double ps_factor;
         vector<Frame*> spectrogram;
         short* synth_signal;
         unsigned int synth_size;

@@ -16,7 +16,7 @@ using namespace std;
 class TimeStretcherPL : public TimeStretcher
 {
     public:
-        TimeStretcherPL(double rate, int n, int s) : TimeStretcher(rate, n, s) {
+        TimeStretcherPL(double f, int n, int s) : TimeStretcher(f, n, s) {
             for (int i=0; i<FFT_SIZE/2+1; ++i)
                 prev_local_peaks.push_back(i);
         }

@@ -14,7 +14,7 @@ using namespace std;
 class TimeStretcher
 {
     public:
-        TimeStretcher(double rate, int n, int s) : ts_factor(rate), FFT_SIZE(n), FRAME_SHIFT(s) {
+        TimeStretcher(double f, int n, int s) : ts_factor(f), FFT_SIZE(n), FRAME_SHIFT(s) {
             cached_phase = vector<double>(n/2+1, 0.0);
             vocoder_func = new VocoderFunctions(n, s);
         }

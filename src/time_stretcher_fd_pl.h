@@ -2,14 +2,16 @@
 #define TIMESTRETCHER_FD_PL_H
 
 #include "time_stretcher_fd.h"
-#include "time_stretcher_pl.h"
 
 using namespace std;
 
+/**
+ * Interpolate/extrapolate on spectrogram, and perform phase locking as well
+*/
 class TimeStretcherFDPL : public TimeStretcherFD
 {
     public:
-        TimeStretcherFDPL(double rate, int n, int s) : TimeStretcherFD(rate, n, s) {
+        TimeStretcherFDPL(double f, int n, int s) : TimeStretcherFD(f, n, s) {
             for (int i=0; i<FFT_SIZE/2+1; ++i)
                 prev_local_peaks.push_back(i);
         }

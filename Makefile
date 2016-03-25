@@ -2,7 +2,7 @@ CXX=g++
 CXXFLAGS=-O3 -Wall
 
 SRC=src
-BUILD=build
+OBJ=obj
 
 SOURCES=main.cc \
     vocoder_functions.cc \
@@ -16,7 +16,7 @@ SOURCES=main.cc \
     pitch_shifter.cc \
     phasevocoder.cc
 
-OBJ:=$(addprefix $(BUILD)/, $(addsuffix .o,$(basename $(SOURCES))))
+OBJECTS:=$(addprefix $(OBJ)/, $(addsuffix .o,$(basename $(SOURCES))))
 
 .PHONY: dir clean
 
@@ -26,13 +26,13 @@ debug: CXXFLAGS += -DDEBUG -g
 debug: all
 
 dir:
-	mkdir -p $(BUILD)
+	mkdir -p $(OBJ)
 
-program: $(OBJ)
+program: $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o PhaseVocoder.exe $^
 
-$(BUILD)/%.o: $(SRC)/%.cc
+$(OBJ)/%.o: $(SRC)/%.cc
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf $(OBJ)
