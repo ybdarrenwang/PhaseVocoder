@@ -1,7 +1,5 @@
 #include "vocoder_functions.h"
 
-double VocoderFunctions::ABS2(double a,double b) {return sqrt(a*a+b*b);}
-
 double VocoderFunctions::unwrapPhase(double delta_phase, int freq_bin) {
     delta_phase -= 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
     delta_phase = fmod(delta_phase, 2.0*PI);

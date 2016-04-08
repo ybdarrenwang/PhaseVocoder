@@ -33,7 +33,7 @@ PhaseVocoder::PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, b
 PhaseVocoder::~PhaseVocoder()
 {
     delete ts;
-    delete ps;
+    if (ps) delete ps;
     delete window;
     delete fft;
     if (input_wav) delete input_wav;

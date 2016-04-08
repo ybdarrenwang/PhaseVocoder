@@ -5,7 +5,7 @@ This is a phase vocoder written in C++. The main purpose of a phase vocoder is t
 
 Current version supports the following time stretching algorithms
 - Default: number of frames remain the same, while the output synthesis-rate/frame-shift/hop-size is modified correspondingly.
-- --phaseLock: perform phase locking as described in [Laroche1999]
+- --phaseLock: perform phase locking as described in [Laroche99]
 - --specInterpolate: perform interpolate/extrapolate on spectrogram, thus the number of frames changed; while the output synthesis-rate/frame-shift/hop-size remain the same as analysis.
 - Both --phaseLocking and --specInterpolate
 
