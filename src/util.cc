@@ -1,5 +1,15 @@
 #include "util.h"
 
+void resample(short* data, const int& len, const double& rate, vector<short>& new_data)
+{
+    double idx = 0;
+    while (idx<len)
+    {
+        new_data.push_back(data[(int)idx]);
+        idx += rate;
+    }
+}
+
 double unwrapPhase(double delta_phase, const int& freq_bin, const int& FRAME_SHIFT, const int& FFT_SIZE) {
     delta_phase -= 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
     delta_phase = fmod(delta_phase, 2.0*PI);

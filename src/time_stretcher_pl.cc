@@ -1,6 +1,6 @@
 #include "time_stretcher_pl.h"
 
-void TimeStretcherPL::UpdatePhase(vector<double> mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph) {
+void TimeStretcherPL::UpdatePhase(const double& ts_factor, vector<double> mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph) {
     vector<int> local_peaks = getLocalPeaks(mag);
 
     for(int freq_bin=0; freq_bin<FFT_SIZE/2+1; ++freq_bin)

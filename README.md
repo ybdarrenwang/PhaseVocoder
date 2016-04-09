@@ -6,15 +6,14 @@ This is a phase vocoder written in C++. The main purpose of a phase vocoder is t
 Current version supports the following time stretching algorithms
 - Default: number of frames remain the same, while the output synthesis-rate/frame-shift/hop-size is modified correspondingly.
 - --phaseLock: perform phase locking as described in [Laroche99]
-- --specInterpolate: perform interpolate/extrapolate on spectrogram, thus the number of frames changed; while the output synthesis-rate/frame-shift/hop-size remain the same as analysis.
-- Both --phaseLocking and --specInterpolate
+- --fdTimeStretch: perform interpolate/extrapolate on spectrogram, thus the number of frames changed; while the output synthesis-rate/frame-shift/hop-size remain the same as analysis.
+- Both --phaseLocking and --fdTimeStretch
+Heuristically, use --phaseLock for human speech and --fdTimeStretch for music yield the best result.
 
-Heuristically, use --phaseLock for human speech and --specInterpolate for music yield the best result.
-
-As to pitch shifting, note the implementation of current version is different from usual.
-* Popular approach: perform time stretching for compensation, then modify output synthesis-rate/frame-shift/hop-size so the total length remains but pitch changed (due to up/down sampling)
-* My version: directly modify spectrogram; both the number of frames and output synthesis-rate/frame-shift/hop-size remain the same as analysis.
-Shall implement the common approach in the future.
+Current version supports the following pitch shifting algorithms
+- Default: perform time stretching for compensation, then modify output synthesis-rate/frame-shift/hop-size so the total length remains but pitch changed (due to up/down sampling)
+- --fdPitchShift: directly modify spectrogram; both the number of frames and output synthesis-rate/frame-shift/hop-size remain the same as analysis.
+Default approach is suggested. --fdPitchShift hasn't been optimized yet.
 
 Also note this version does not include source-filter decomposition, nor other advanced pitch shifting algorithms.
 

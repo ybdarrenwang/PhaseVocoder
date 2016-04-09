@@ -16,7 +16,7 @@ using namespace std;
 
 class PhaseVocoder {
     public:
-        PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool spec_interpolate, double _ts_factor, double _ps_factor);
+        PhaseVocoder(int frame_length, int frame_shift, bool phase_lock, bool fd_time_stretch, bool fd_pitch_shift, double _ts_factor, double _ps_factor);
         virtual ~PhaseVocoder();
 
         virtual void ReadWave(string input_file);
