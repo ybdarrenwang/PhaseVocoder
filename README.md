@@ -15,8 +15,6 @@ Current version supports the following pitch shifting algorithms
 - --fdPitchShift: directly modify spectrogram; both the number of frames and output synthesis-rate/frame-shift/hop-size remain the same as analysis.
 Default approach is suggested. --fdPitchShift hasn't been optimized yet.
 
-Also note this version does not include source-filter decomposition, nor other advanced pitch shifting algorithms.
-
 Platforms
 ---------
 Linux, OS X
