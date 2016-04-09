@@ -16,7 +16,7 @@ void TimeStretcherFD::Stretch(vector<Frame*>& input_spec, vector<Frame*>& output
         int next_frame_idx = prev_frame_idx+1;
         double next_frame_weight = 1-prev_frame_weight;
 
-        mag = vocoder_func->vectorWeightedSum(input_spec[prev_frame_idx]->getMagnitude(), input_spec[next_frame_idx]->getMagnitude(), prev_frame_weight, next_frame_weight);
+        mag = vectorWeightedSum(input_spec[prev_frame_idx]->getMagnitude(), input_spec[next_frame_idx]->getMagnitude(), prev_frame_weight, next_frame_weight);
 
         f = new Frame(FFT_SIZE);
         if (output_spec.size()>0)

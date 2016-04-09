@@ -6,7 +6,7 @@ OBJ=obj
 BIN=bin
 
 SOURCES=main.cc \
-    vocoder_functions.cc \
+    util.cc \
     time_stretcher.cc \
     time_stretcher_pl.cc \
     time_stretcher_fd.cc \
