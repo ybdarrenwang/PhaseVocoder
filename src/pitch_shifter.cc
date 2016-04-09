@@ -1,10 +1,10 @@
 #include "pitch_shifter.h"
 
-void PitchShifter::UpdatePhase(vector<double>& mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph) {
+void PitchShifter::UpdatePhase(const double& ps_factor, vector<double>& mag, vector<double> prev_phase, vector<double> next_phase, vector<double>& synth_ph) {
     for(int i=0;i<FFT_SIZE/2+1;i++) {
         synth_freq_bin[i] = floor(i*ps_factor);
         bin_shift_residual[i] = i*ps_factor-synth_freq_bin[i];
-        synth_ph[i] = fmod(synth_ph[i]+ps_factor*vocoder_func->unwrapPhase(next_phase[i]-prev_phase[i], i), 2.0*PI);
+        synth_ph[i] = fmod(synth_ph[i]+ps_factor*unwrapPhase(next_phase[i]-prev_phase[i], i, FRAME_SHIFT, FFT_SIZE), 2.0*PI);
     }
 }
 
@@ -38,7 +38,7 @@ void PitchShifter::SynthesizeFrame(vector<double>& mag, vector<double>& ph, Fram
     f->setSpectrum(&synth_spec[0]);
 }
 
-void PitchShifter::Shift(vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase)
+void PitchShifter::Shift(const double& ps_factor, vector<Frame*>& input_spec, vector<Frame*>& output_spec, bool reset_phase)
 {
     vector<int> subband;
     vector<double> mag, ph;
@@ -47,7 +47,7 @@ void PitchShifter::Shift(vector<Frame*>& input_spec, vector<Frame*>& output_spec
     for (unsigned int sample_idx=0; sample_idx<input_spec.size(); ++sample_idx) {
         mag = input_spec[sample_idx]->getMagnitude();
         if (sample_idx)
-            UpdatePhase(mag, input_spec[sample_idx-1]->getPhase(), input_spec[sample_idx]->getPhase(), ph);
+            UpdatePhase(ps_factor, mag, input_spec[sample_idx-1]->getPhase(), input_spec[sample_idx]->getPhase(), ph);
         else {
             if (reset_phase) {
                 ph = input_spec[0]->getPhase();
@@ -56,7 +56,7 @@ void PitchShifter::Shift(vector<Frame*>& input_spec, vector<Frame*>& output_spec
             }
             else {
                 ph = cached_phase;
-                UpdatePhase(mag, cached_phase, input_spec[0]->getPhase(), ph);
+                UpdatePhase(ps_factor, mag, cached_phase, input_spec[0]->getPhase(), ph);
             }
         }
         f = new Frame(FFT_SIZE);

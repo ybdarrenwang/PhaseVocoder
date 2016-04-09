@@ -1,14 +1,22 @@
-#include "vocoder_functions.h"
+#include "util.h"
 
-double VocoderFunctions::ABS2(double a,double b) {return sqrt(a*a+b*b);}
+void resample(short* data, const int& len, const double& rate, vector<short>& new_data)
+{
+    double idx = 0;
+    while (idx<len)
+    {
+        new_data.push_back(data[(int)idx]);
+        idx += rate;
+    }
+}
 
-double VocoderFunctions::unwrapPhase(double delta_phase, int freq_bin) {
+double unwrapPhase(double delta_phase, const int& freq_bin, const int& FRAME_SHIFT, const int& FFT_SIZE) {
     delta_phase -= 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
     delta_phase = fmod(delta_phase, 2.0*PI);
     return delta_phase + 2*PI*freq_bin*FRAME_SHIFT/FFT_SIZE;
 }
 
-vector<double> VocoderFunctions::vectorWeightedSum(const vector<double> &v1, const vector<double> &v2, double w1, double w2) {
+vector<double> vectorWeightedSum(const vector<double> &v1, const vector<double> &v2, double w1, double w2) {
     if (w2==0) return v1;
     if (w1==0) return v2;
     vector<double> ans;
@@ -27,7 +35,7 @@ vector<double> VocoderFunctions::vectorWeightedSum(const vector<double> &v1, con
  * - peak: larger then preceding 2 and following 2 elements
  * - valley: the minimum between 2 peaks
  */
-vector<int> VocoderFunctions::getLocalPeaks(vector<double>& spec) {
+vector<int> getLocalPeaks(vector<double>& spec) {
     vector<int> peak_idx;
     int peak_ptr = 0;
     int valley_ptr = 0;
@@ -51,7 +59,7 @@ vector<int> VocoderFunctions::getLocalPeaks(vector<double>& spec) {
     return peak_idx;
 }
 /*
-void VocoderFunctions::new_ChannelGrouping(double *Spec, int *ChannelGroupFlag, double pitch) {
+void new_ChannelGrouping(double *Spec, int *ChannelGroupFlag, double pitch) {
     int i,j;
     int GroupBoundary, PrevGroupBoundary=0, PrevPeak=0;
     double MinTemp;
