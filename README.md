@@ -8,6 +8,7 @@ Current version supports the following time stretching algorithms
 - --phaseLock: perform phase locking as described in [Laroche99]
 - --fdTimeStretch: perform interpolate/extrapolate on spectrogram, thus the number of frames changed; while the output synthesis-rate/frame-shift/hop-size remain the same as analysis.
 - Both --phaseLocking and --fdTimeStretch
+
 Heuristically, use --phaseLock for human speech and --fdTimeStretch for music yield the best result.
 
 Current version supports the following pitch shifting algorithms
